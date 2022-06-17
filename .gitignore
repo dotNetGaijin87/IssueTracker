@@ -1,0 +1,11 @@
+#Visual Studio/Code
+.vscode/
+.vs/
+/IssueTracker.IntegrationTests/bin/Debug/net6.0
+/IssueTracker.IntegrationTests/obj
+/obj/Docker/ContainerToolsExceptions.json
+/docker-compose.yml
+/server/src/IssueTracker/.config/dotnet-tools.json
+*.json
+/client/src/AppSettings.ts
+/heroku.yml
