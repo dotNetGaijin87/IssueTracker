@@ -1,0 +1,19 @@
+{
+  "settings": {
+    "application_language": "Language",
+    "theme": { "title": "Theme", "light": "Light", "dark": "Dark" }
+  },
+  "routes": {
+    "home": "Home",
+    "projects": "Projects",
+    "issues": "Issues",
+    "comments": "Comments",
+    "kanban": "Kanban Board",
+    "settings": "Settings",
+    "signin": "Sign in",
+    "signin-callback": "Signing in",
+    "signout": "Sign out",
+    "signout-callback": "Signing out",
+    "users": "Users"
+  }
+}

@@ -7,5 +7,7 @@
 /docker-compose.yml
 /server/src/IssueTracker/.config/dotnet-tools.json
 *.json
-/client/src/AppSettings.ts
+!/client/package.json
+!/client/tsconfig.json
+!/client/public/locales/en/translation.json
 /heroku.yml
