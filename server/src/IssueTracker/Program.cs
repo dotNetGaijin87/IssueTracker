@@ -14,7 +14,7 @@ builder.Services.AddProblemDetailsExt();
 builder.Services.AddApplicationExt(builder.Configuration);
 builder.Services.AddInfrastructureExt(builder.Configuration);
 builder.Services.AddAuthenticationExt(builder.Configuration);
-
+builder.Services.AddHealthChecks();
 builder.Services.AddControllers()
     .AddJsonOptions(opts =>
     {
@@ -24,7 +24,6 @@ builder.Services.AddControllers()
 
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
 builder.Services.AddHttpContextAccessor();
 
 builder.Services.TryAddSingleton<IActionContextAccessor, ActionContextAccessor>();
@@ -33,6 +32,7 @@ builder.Services.TryAddSingleton<IActionContextAccessor, ActionContextAccessor>(
 // Pipline creation
 //
 var app = builder.Build();
+app.MapHealthChecks("/api/healthstatus");
 
 if (app.Environment.IsDevelopment())
 {
@@ -40,14 +40,6 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseProblemDetails();
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-
-}
-
 app.UseHttpsRedirection();
 
 app.UseCors(opt =>
@@ -56,11 +48,9 @@ app.UseCors(opt =>
     .AllowAnyMethod()
     .AllowCredentials()
     .WithOrigins(builder.Configuration["client"]);
- 
 });
 app.UseAuthentication();
 app.UseAuthorization();
-
 app.MapControllers();
 if (app.Environment.IsDevelopment())
 {
