@@ -145,8 +145,10 @@ export default function AssigneesSetter({
           ))}
         </AvatarGroup>
       )}
-      renderOption={(props, option, { selected }) => (
-        <MenuItem key={option} {...props} sx={{ m: 0, p: 0 }}>
+      renderOption={(props, option, { selected }) => {
+        const { key, ...optionProps } = props;
+        return (
+        <MenuItem key={key} {...optionProps} sx={{ m: 0, p: 0 }}>
           <>
             <Checkbox
               icon={icon}
@@ -160,7 +162,8 @@ export default function AssigneesSetter({
             />
           </>
         </MenuItem>
-      )}
+        );
+      }}
       renderInput={(params) => (
         <TextField
           sx={{ margin: 0, widht: 'inherit' }}

@@ -20,7 +20,7 @@ public class AuthorizationBehaviour<TRequest, TResponse> : IPipelineBehavior<TRe
         _userCredentialsService = userRoleService;
 }
 
-    public async Task<TResponse> Handle(TRequest request, CancellationToken cancellationToken, RequestHandlerDelegate<TResponse> next)
+    public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
     { 
         var authAttributes = request.GetType().GetCustomAttributes<AuthorizeUserAttribute>();
         request.UserCredentials = _userCredentialsService.Get();

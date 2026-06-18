@@ -7,14 +7,14 @@ namespace IssueTracker.ApplicationTests;
 public class ListCommentsQueryValidatorTests
 {
     [Fact]
-    public void TestValidate_ValidPage_ValidationSuccess()
+    public async Task TestValidate_ValidPage_ValidationSuccess()
     {
         // ARRANGE
         var validator = new ListCommentsQueryValidator();
         var model = new ListCommentsQuery() { Page = 1};
 
         // ACT
-        var result = validator.TestValidate(model);
+        var result = await validator.TestValidateAsync(model);
 
         // ASSERT
         result.ShouldNotHaveValidationErrorFor(x => x.Page);
@@ -23,28 +23,28 @@ public class ListCommentsQueryValidatorTests
     [Theory]
     [InlineData(-1)]
     [InlineData(0)]
-    public void TestValidate_InvalidPage_ValidationError(int page)
+    public async Task TestValidate_InvalidPage_ValidationError(int page)
     {
         // ARRANGE
         var validator = new ListCommentsQueryValidator();
         var model = new ListCommentsQuery() { Page = page };
 
         // ACT
-        var result = validator.TestValidate(model);
+        var result = await validator.TestValidateAsync(model);
 
         // ASSERT
         result.ShouldHaveValidationErrorFor(x => x.Page);
     }
 
     [Fact]
-    public void TestValidate_ValidPageSize_ValidationSuccess()
+    public async Task TestValidate_ValidPageSize_ValidationSuccess()
     {
         // ARRANGE
         var validator = new ListCommentsQueryValidator();
         var model = new ListCommentsQuery() { PageSize = 10 };
 
         // ACT
-        var result = validator.TestValidate(model);
+        var result = await validator.TestValidateAsync(model);
 
         // ASSERT
         result.ShouldNotHaveValidationErrorFor(x => x.PageSize);
@@ -53,14 +53,14 @@ public class ListCommentsQueryValidatorTests
     [Theory]
     [InlineData(-1)]
     [InlineData(21)]
-    public void TestValidate_InvalidContent_ValidationError(int pageSize)
+    public async Task TestValidate_InvalidContent_ValidationError(int pageSize)
     {
         // ARRANGE
         var validator = new ListCommentsQueryValidator();
         var model = new ListCommentsQuery() { PageSize = pageSize };
 
         // ACT
-        var result = validator.TestValidate(model);
+        var result = await validator.TestValidateAsync(model);
 
         // ASSERT
         result.ShouldHaveValidationErrorFor(x => x.PageSize);

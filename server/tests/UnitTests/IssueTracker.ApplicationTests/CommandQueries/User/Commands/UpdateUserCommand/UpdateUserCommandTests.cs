@@ -19,7 +19,7 @@ namespace IssueTracker.ApplicationTests;
 public class UpdateUserCommandTests
 {
     [Fact]
-    public async void Handle_ValidData_ReturnedAndSavedDataCorrect()
+    public async Task Handle_ValidData_ReturnedAndSavedDataCorrect()
     {
         // ARRANGE
         using AppDbContext dbContext = DbHelpers.GetEmptyDb(new DateTime(2002, 2, 2, 2, 2, 2));
@@ -59,7 +59,7 @@ public class UpdateUserCommandTests
     }
 
     [Fact]
-    public async void Handle_UserNotFound_ThrowsException()
+    public async Task Handle_UserNotFound_ThrowsException()
     {
         // ARRANGE
         using AppDbContext dbContext = DbHelpers.GetEmptyDb(new DateTime(2002, 2, 2, 2, 2, 2));
@@ -82,7 +82,7 @@ public class UpdateUserCommandTests
     }
 
     [Fact]
-    public async void Handle_ThrowsException()
+    public async Task Handle_ThrowsException()
     {
         // ARRANGE
         var dContext = new Mock<AppDbContext>();

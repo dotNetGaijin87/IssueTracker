@@ -17,7 +17,7 @@ public class UpdateIssueCommandValidatorTests
     [InlineData("abc")]
     [InlineData("1234")]
     [InlineData("a123456789123456789012345678901234567890123456789a")]
-    public void TestValidate_ValidId_ValidationSuccess(string id)
+    public async Task TestValidate_ValidId_ValidationSuccess(string id)
     {
         // ARRANGE
         using AppDbContext dbContext = DbHelpers.GetEmptyDb(DateTime.MinValue);
@@ -25,7 +25,7 @@ public class UpdateIssueCommandValidatorTests
         var model = new UpdateIssueCommand() { Id = id };
 
         // ACT
-        var result = validator.TestValidate(model);
+        var result = await validator.TestValidateAsync(model);
 
         // ASSERT
         result.ShouldNotHaveValidationErrorFor(x => x.Id);
@@ -37,7 +37,7 @@ public class UpdateIssueCommandValidatorTests
     [InlineData("ab")]
     [InlineData("$")]
     [InlineData("a12345678912345678901234567890123456789012345678901")]
-    public void TestValidate_InValidId_ValidationError(string id)
+    public async Task TestValidate_InValidId_ValidationError(string id)
     {
         // ARRANGE
         using AppDbContext dbContext = DbHelpers.GetEmptyDb(DateTime.MinValue);
@@ -45,7 +45,7 @@ public class UpdateIssueCommandValidatorTests
         var model = new UpdateIssueCommand() { Id = id };
 
         // ACT
-        var result = validator.TestValidate(model);
+        var result = await validator.TestValidateAsync(model);
 
         // ASSERT
         result.ShouldHaveValidationErrorFor(x => x.Id);
@@ -54,7 +54,7 @@ public class UpdateIssueCommandValidatorTests
     [Theory]
     [InlineData(null)]
     [InlineData("")]
-    public void TestValidate_EmptyFieldMask_ValidationSuccess(string summary)
+    public async Task TestValidate_EmptyFieldMask_ValidationSuccess(string summary)
     {
         // ARRANGE
         using AppDbContext dbContext = DbHelpers.GetEmptyDb(DateTime.MinValue);
@@ -62,7 +62,7 @@ public class UpdateIssueCommandValidatorTests
         var model = new UpdateIssueCommand() { Id = "Issue_1", Summary = summary };
 
         // ACT
-        var result = validator.TestValidate(model);
+        var result = await validator.TestValidateAsync(model);
 
         // ASSERT
         result.ShouldNotHaveValidationErrorFor(x => x.Summary);
@@ -72,7 +72,7 @@ public class UpdateIssueCommandValidatorTests
     [InlineData("abcdefghij")]
     [InlineData("1234567890")]
     [InlineData("abcdefghijklmnopqrstvwzabcdefghi")]
-    public void TestValidate_ValidSummary_ValidationSuccess(string summary)
+    public async Task TestValidate_ValidSummary_ValidationSuccess(string summary)
     {
         // ARRANGE
         using AppDbContext dbContext = DbHelpers.GetEmptyDb(DateTime.MinValue);
@@ -80,7 +80,7 @@ public class UpdateIssueCommandValidatorTests
         var model = new UpdateIssueCommand() { Id = "Issue_1", Summary = summary, FieldMask = new List<string> { "Summary" } };
 
         // ACT
-        var result = validator.TestValidate(model);
+        var result = await validator.TestValidateAsync(model);
 
         // ASSERT
         result.ShouldNotHaveValidationErrorFor(x => x.Summary);
@@ -91,7 +91,7 @@ public class UpdateIssueCommandValidatorTests
     [InlineData("")]
     [InlineData("abcdefghi")]
     [InlineData(@"a12345678912345678901234567890123456789012345678901a12345678912345678901234567890123456789012345678901")]
-    public void TestValidate_InValidSummary_ValidationError(string summary)
+    public async Task TestValidate_InValidSummary_ValidationError(string summary)
     {
         // ARRANGE
         using AppDbContext dbContext = DbHelpers.GetEmptyDb(DateTime.MinValue);
@@ -99,7 +99,7 @@ public class UpdateIssueCommandValidatorTests
         var model = new UpdateIssueCommand() { Id = "Issue_1", Summary = summary, FieldMask = new List<string> { "Summary" } };
 
         // ACT
-        var result = validator.TestValidate(model);
+        var result = await validator.TestValidateAsync(model);
 
         // ASSERT
         result.ShouldHaveValidationErrorFor(x => x.Summary);
@@ -108,7 +108,7 @@ public class UpdateIssueCommandValidatorTests
     [Theory]
     [InlineData(UserRole.admin)]
     [InlineData(UserRole.manager)]
-    public void TestValidate_ValidRole_ValidationSuccess(UserRole role)
+    public async Task TestValidate_ValidRole_ValidationSuccess(UserRole role)
     {
         // ARRANGE
         using AppDbContext dbContext = DbHelpers.GetEmptyDb(DateTime.MinValue);
@@ -116,7 +116,7 @@ public class UpdateIssueCommandValidatorTests
         var model = new UpdateIssueCommand() { UserCredentials = new UserCredentials { Role = role } };
 
         // ACT
-        var result = validator.TestValidate(model);
+        var result = await validator.TestValidateAsync(model);
 
         // ASSERT
         result.ShouldNotHaveValidationErrorFor(x => x.UserCredentials.Role);
@@ -125,7 +125,7 @@ public class UpdateIssueCommandValidatorTests
     [Theory]
     [InlineData(IssuePermission.CanModify)]
     [InlineData(IssuePermission.CanDelete)]
-    public void TestValidate_UserHasValidRights_ValidationSuccess(IssuePermission permission)
+    public async Task TestValidate_UserHasValidRights_ValidationSuccess(IssuePermission permission)
     {
         // ARRANGE
         using AppDbContext dbContext = DbHelpers.GetEmptyDb(DateTime.MinValue);
@@ -143,14 +143,14 @@ public class UpdateIssueCommandValidatorTests
         };
 
         // ACT
-        var result = validator.TestValidate(model);
+        var result = await validator.TestValidateAsync(model);
 
         // ASSERT
         result.ShouldNotHaveValidationErrorFor(x => x);
     }
 
     [Fact]
-    public void TestValidate_UserDoesNotHaveRights_ValidationError()
+    public async Task TestValidate_UserDoesNotHaveRights_ValidationError()
     {
         // ARRANGE
         using AppDbContext dbContext = DbHelpers.GetEmptyDb(DateTime.MinValue);
@@ -168,7 +168,7 @@ public class UpdateIssueCommandValidatorTests
         };
 
         // ACT
-        var result = validator.TestValidate(model);
+        var result = await validator.TestValidateAsync(model);
 
         // ASSERT
         result.ShouldHaveValidationErrorFor(x => x);

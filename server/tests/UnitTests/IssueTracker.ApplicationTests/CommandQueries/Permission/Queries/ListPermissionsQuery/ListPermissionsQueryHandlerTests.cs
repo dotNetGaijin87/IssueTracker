@@ -193,7 +193,7 @@ public class ListPermissionsQueryHandlerTests
     [InlineData(2)]
     [InlineData(5)]
     [InlineData(10)]
-    public async void Handle_PageSizeSmallerThanAllRecords_RecordsReturnedEqualsPageSize(int pageSize)
+    public async Task Handle_PageSizeSmallerThanAllRecords_RecordsReturnedEqualsPageSize(int pageSize)
     {
         // ARRANGE
         using AppDbContext dbContext = await GetSeededDbWith3Users5Issues12Permissions();
@@ -212,7 +212,7 @@ public class ListPermissionsQueryHandlerTests
     [Theory]
     [InlineData(15)]
     [InlineData(20)]
-    public async void Handle_PageSizeGreaterThanAllRecords_PageCountEquals1(int pageSize)
+    public async Task Handle_PageSizeGreaterThanAllRecords_PageCountEquals1(int pageSize)
     {
         // ARRANGE
         using AppDbContext dbContext = await GetSeededDbWith3Users5Issues12Permissions();
@@ -230,7 +230,7 @@ public class ListPermissionsQueryHandlerTests
     }
 
     [Fact]
-    public async void Handle_FirstPage_Returns3Permissions()
+    public async Task Handle_FirstPage_Returns3Permissions()
     {
         // ARRANGE
         using AppDbContext dbContext = await GetSeededDbWith3Users5Issues12Permissions();
@@ -248,7 +248,7 @@ public class ListPermissionsQueryHandlerTests
     }
 
     [Fact]
-    public async void Handle_FilterByCreator_Returns5Permissions()
+    public async Task Handle_FilterByCreator_Returns5Permissions()
     {
         // ARRANGE
         using AppDbContext dbContext = await GetSeededDbWith3Users5Issues12Permissions();
@@ -264,7 +264,7 @@ public class ListPermissionsQueryHandlerTests
     }
 
     [Fact]
-    public async void Handle_ThrowsException()
+    public async Task Handle_ThrowsException()
     {
         // ARRANGE
         var dbContext = new Mock<AppDbContext>();

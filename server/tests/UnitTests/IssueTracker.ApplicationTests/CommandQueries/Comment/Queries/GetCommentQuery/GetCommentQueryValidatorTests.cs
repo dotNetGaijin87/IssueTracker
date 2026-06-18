@@ -8,14 +8,14 @@ namespace IssueTracker.ApplicationTests;
 public class GetCommentQueryValidatorTests
 {
     [Fact]
-    public void TestValidate_ValidId_ValidationSuccess()
+    public async Task TestValidate_ValidId_ValidationSuccess()
     {
         // ARRANGE
         var validator = new GetCommentQueryValidator();
         var model = new GetCommentQuery() { Id = "Comment_1" };
 
         // ACT
-        var result = validator.TestValidate(model);
+        var result = await validator.TestValidateAsync(model);
 
         // ASSERT
         result.ShouldNotHaveValidationErrorFor(x => x.Id);
@@ -24,14 +24,14 @@ public class GetCommentQueryValidatorTests
     [Theory]
     [InlineData(null)]
     [InlineData("")]
-    public void TestValidate_InvalidId_ValidationError(string commentId)
+    public async Task TestValidate_InvalidId_ValidationError(string commentId)
     {
         // ARRANGE
         var validator = new GetCommentQueryValidator();
         var model = new GetCommentQuery() { Id = commentId };
 
         // ACT
-        var result = validator.TestValidate(model);
+        var result = await validator.TestValidateAsync(model);
 
         // ASSERT
         result.ShouldHaveValidationErrorFor(x => x.Id);

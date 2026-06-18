@@ -12,8 +12,9 @@ axios.interceptors.response.use(
     return response;
   },
   (error: AxiosError) => {
-    if (error.response?.data.detail) {
-      return Promise.reject({ message: error.response?.data.detail });
+    const data = error.response?.data as { detail?: string } | undefined;
+    if (data?.detail) {
+      return Promise.reject({ message: data.detail });
     }
     return Promise.reject(error);
   }

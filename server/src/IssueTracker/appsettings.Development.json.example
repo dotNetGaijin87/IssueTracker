@@ -1,0 +1,14 @@
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft": "Warning",
+      "Microsoft.Hosting.Lifetime": "Information"
+    }
+  },
+  "ConnectionStrings": {
+    "DefaultConnection": "Server=localhost;Database=IssueTracker;User Id=sa;Password=__CHANGE_ME__;TrustServerCertificate=True;",
+    "IntegratioTestConnection": "Server=localhost;Database=IssueTracker_Test;User Id=sa;Password=__CHANGE_ME__;TrustServerCertificate=True;"
+  },
+  "client": "http://localhost:3000"
+}

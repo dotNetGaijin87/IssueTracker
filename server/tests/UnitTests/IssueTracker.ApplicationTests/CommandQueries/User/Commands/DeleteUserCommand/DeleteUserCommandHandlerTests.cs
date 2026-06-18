@@ -16,7 +16,7 @@ namespace IssueTracker.ApplicationTests;
 public class DeleteUserCommandHandlerTests
 {
     [Fact]
-    public async void Handle_UserExists_Success()
+    public async Task Handle_UserExists_Success()
     {
         // ARRANGE
         using AppDbContext dbContext = DbHelpers.GetEmptyDb(DateTime.MinValue);
@@ -39,7 +39,7 @@ public class DeleteUserCommandHandlerTests
     }
 
     [Fact]
-    public async void Handle_UserNotFound_ThrowsException()
+    public async Task Handle_UserNotFound_ThrowsException()
     {
         // ARRANGE
         using AppDbContext dbContext = DbHelpers.GetEmptyDb(DateTime.MinValue);
@@ -61,7 +61,7 @@ public class DeleteUserCommandHandlerTests
     }
 
     [Fact]
-    public async void Handle_ExceptionRaised_ThrowsException()
+    public async Task Handle_ExceptionRaised_ThrowsException()
     {
         // ARRANGE
         var dbContext = new Mock<AppDbContext>();

@@ -26,7 +26,7 @@ public static class ServiceCollectionExtensions
 
         // Add third party libraries
         services
-            .AddMediatR(Assembly.GetExecutingAssembly())
+            .AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()))
             .AddAutoMapper(Assembly.GetExecutingAssembly());
         AssemblyScanner.FindValidatorsInAssembly(typeof(ApplicationEntryPoint).Assembly)
                 .ForEach(item => services.AddScoped(item.InterfaceType, item.ValidatorType));

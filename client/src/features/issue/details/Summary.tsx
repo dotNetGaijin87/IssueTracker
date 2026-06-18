@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Box, Divider, Grow, TextField, Typography } from '@mui/material';
-import { useParams } from 'react-router';
+import { useParams } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import { adapter } from '../../../adapters/adapter';
 import DeleteIcon from '@mui/icons-material/Delete';

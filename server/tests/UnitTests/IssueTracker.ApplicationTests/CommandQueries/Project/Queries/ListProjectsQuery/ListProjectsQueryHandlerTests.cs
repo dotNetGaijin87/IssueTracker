@@ -141,7 +141,7 @@ public class ListProjectsQueryHandlerTests
     [InlineData(2)]
     [InlineData(5)]
     [InlineData(10)]
-    public async void Handle_PageSizeSmallerThanAllRecords_RecordsReturnedEqualsPageSize(int pageSize)
+    public async Task Handle_PageSizeSmallerThanAllRecords_RecordsReturnedEqualsPageSize(int pageSize)
     {
         // ARRANGE
         using AppDbContext dbContext = await GetSeededDbWith13Projects();
@@ -159,7 +159,7 @@ public class ListProjectsQueryHandlerTests
     [Theory]
     [InlineData(15)]
     [InlineData(20)]
-    public async void Handle_PageSizeGreaterThanAllRecords_PageCountEquals1(int pageSize)
+    public async Task Handle_PageSizeGreaterThanAllRecords_PageCountEquals1(int pageSize)
     {
         // ARRANGE
         using AppDbContext dbContext = await GetSeededDbWith13Projects();
@@ -176,7 +176,7 @@ public class ListProjectsQueryHandlerTests
     }
 
     [Fact]
-    public async void Handle_SecondaPage_Returns3Projects()
+    public async Task Handle_SecondaPage_Returns3Projects()
     {
         // ARRANGE
         using AppDbContext dbContext = await GetSeededDbWith13Projects();
@@ -193,7 +193,7 @@ public class ListProjectsQueryHandlerTests
     }
 
     [Fact]
-    public async void Handle_FilterById_Returns2ProjectsWithCorrectData()
+    public async Task Handle_FilterById_Returns2ProjectsWithCorrectData()
     {
         // ARRANGE
         using AppDbContext dbContext = await GetSeededDbWith13Projects();
@@ -228,7 +228,7 @@ public class ListProjectsQueryHandlerTests
     }
 
     [Fact]
-    public async void Handle_FilterByCreator_Returns3Projects()
+    public async Task Handle_FilterByCreator_Returns3Projects()
     {
         // ARRANGE
         using AppDbContext dbContext = await GetSeededDbWith13Projects();
@@ -249,7 +249,7 @@ public class ListProjectsQueryHandlerTests
     }
 
     [Fact]
-    public async void Handle_FilterByProgress_Returns6Projects()
+    public async Task Handle_FilterByProgress_Returns6Projects()
     {
         // ARRANGE
         using AppDbContext dbContext = await GetSeededDbWith13Projects();
@@ -270,7 +270,7 @@ public class ListProjectsQueryHandlerTests
     }
 
     [Fact]
-    public async void Handle_ThrowsException()
+    public async Task Handle_ThrowsException()
     {
         // ARRANGE
         var dContext = new Mock<AppDbContext>();

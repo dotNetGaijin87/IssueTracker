@@ -18,7 +18,7 @@ namespace IssueTracker.ApplicationTests;
 public class GetIssueKanbanQueryTests
 {
     [Fact]
-    public async void Handle_ValidData_ReturnsCorrectData()
+    public async Task Handle_ValidData_ReturnsCorrectData()
     {
         // ARRANGE
         AppDbContext dbContext = DbHelpers.GetEmptyDb(DateTime.MinValue);
@@ -99,7 +99,7 @@ public class GetIssueKanbanQueryTests
     }
 
     [Fact]
-    public async void Handle_ThrowsException()
+    public async Task Handle_ThrowsException()
     {
         // ARRANGE
         var dbContext = new Mock<AppDbContext>();

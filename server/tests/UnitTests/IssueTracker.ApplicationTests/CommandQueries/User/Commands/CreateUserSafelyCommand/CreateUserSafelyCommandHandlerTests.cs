@@ -21,7 +21,7 @@ public class CreateUserSafelyCommandHandlerTests
     [InlineData(UserRole.admin,true)]
     [InlineData(UserRole.manager, false)]
     [InlineData(UserRole.employee, false)]
-    public async void Handle_UserLogsForTheFirstTime_DbAndReturendDataCorrect(UserRole role, bool isActivated)
+    public async Task Handle_UserLogsForTheFirstTime_DbAndReturendDataCorrect(UserRole role, bool isActivated)
     {
         // ARRANGE
         using AppDbContext dbContext = DbHelpers.GetEmptyDb(new DateTime(2000, 1, 1, 12, 0, 0));
@@ -60,7 +60,7 @@ public class CreateUserSafelyCommandHandlerTests
     }
 
     [Fact]
-    public async void Handle_UserLogsNthTime_DbAndReturendDataCorrect()
+    public async Task Handle_UserLogsNthTime_DbAndReturendDataCorrect()
     {
         // ARRANGE
         using AppDbContext dbContext = DbHelpers.GetEmptyDb(new DateTime(2003, 3, 3, 3, 3, 3));
@@ -119,7 +119,7 @@ public class CreateUserSafelyCommandHandlerTests
     }
 
     [Fact]
-    public async void Handle_ExceptionRaised_ThrowsException()
+    public async Task Handle_ExceptionRaised_ThrowsException()
     {
         // ARRANGE
         var dContext = new Mock<AppDbContext>();

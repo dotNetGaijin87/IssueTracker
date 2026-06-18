@@ -8,14 +8,14 @@ namespace IssueTracker.ApplicationTests;
 public class GetPermissionQueryValidatorTests
 {
     [Fact]
-    public void TestValidate_ValidUserId_ValidationSuccess()
+    public async Task TestValidate_ValidUserId_ValidationSuccess()
     {
         // ARRANGE
         var validator = new GetPermissionQueryValidator();
         var model = new GetPermissionQuery() { UserId = "User_1" };
 
         // ACT
-        var result = validator.TestValidate(model);
+        var result = await validator.TestValidateAsync(model);
 
         // ASSERT
         result.ShouldNotHaveValidationErrorFor(x => x.UserId);
@@ -24,28 +24,28 @@ public class GetPermissionQueryValidatorTests
     [Theory]
     [InlineData(null)]
     [InlineData("")]
-    public void TestValidate_InValidUserId_ValidationError(string userId)
+    public async Task TestValidate_InValidUserId_ValidationError(string userId)
     {
         // ARRANGE
         var validator = new GetPermissionQueryValidator();
         var model = new GetPermissionQuery() { UserId = userId };
 
         // ACT
-        var result = validator.TestValidate(model);
+        var result = await validator.TestValidateAsync(model);
 
         // ASSERT
         result.ShouldHaveValidationErrorFor(x => x.UserId);
     }
 
     [Fact]
-    public void TestValidate_ValidIssueId_ValidationSuccess()
+    public async Task TestValidate_ValidIssueId_ValidationSuccess()
     {
         // ARRANGE
         var validator = new GetPermissionQueryValidator();
         var model = new GetPermissionQuery() { IssueId = "Issue_1" };
 
         // ACT
-        var result = validator.TestValidate(model);
+        var result = await validator.TestValidateAsync(model);
 
         // ASSERT
         result.ShouldNotHaveValidationErrorFor(x => x.IssueId);
@@ -54,14 +54,14 @@ public class GetPermissionQueryValidatorTests
     [Theory]
     [InlineData(null)]
     [InlineData("")]
-    public void TestValidate_InValidIssueId_ValidationError(string issueId)
+    public async Task TestValidate_InValidIssueId_ValidationError(string issueId)
     {
         // ARRANGE
         var validator = new GetPermissionQueryValidator();
         var model = new GetPermissionQuery() { IssueId = issueId };
 
         // ACT
-        var result = validator.TestValidate(model);
+        var result = await validator.TestValidateAsync(model);
 
         // ASSERT
         result.ShouldHaveValidationErrorFor(x => x.IssueId);

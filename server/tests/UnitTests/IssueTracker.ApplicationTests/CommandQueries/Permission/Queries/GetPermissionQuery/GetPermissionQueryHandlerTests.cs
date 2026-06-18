@@ -17,7 +17,7 @@ namespace IssueTracker.ApplicationTests;
 public class GetPermissionQueryHandlerTests
 {
     [Fact]
-    public async void Handle_ValidData_ReturnsCorrectData()
+    public async Task Handle_ValidData_ReturnsCorrectData()
     {
         // ARRANGE
         AppDbContext dbContext = DbHelpers.GetDbWith3Users3Projects3Issues3permissions(default);
@@ -61,7 +61,7 @@ public class GetPermissionQueryHandlerTests
     }
 
     [Fact]
-    public async void Handle_ThrowsException()
+    public async Task Handle_ThrowsException()
     {
         // ARRANGE
         var dbContext = new Mock<AppDbContext>();

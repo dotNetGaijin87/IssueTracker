@@ -7,14 +7,14 @@ namespace IssueTracker.ApplicationTests;
 public class UpdatePermissionCommandValidatorTests
 {
     [Fact]
-    public void TestValidate_ValidUserId_ValidationSuccess()
+    public async Task TestValidate_ValidUserId_ValidationSuccess()
     {
         // ARRANGE
         var validator = new UpdatePermissionCommandValidator();
         var model = new UpdatePermissionCommand() { UserId = "User_1" };
 
         // ACT
-        var result = validator.TestValidate(model);
+        var result = await validator.TestValidateAsync(model);
 
         // ASSERT
         result.ShouldNotHaveValidationErrorFor(x => x.UserId);
@@ -23,28 +23,28 @@ public class UpdatePermissionCommandValidatorTests
     [Theory]
     [InlineData(null)]
     [InlineData("")]
-    public void TestValidate_InValidUserId_ValidationError(string userId)
+    public async Task TestValidate_InValidUserId_ValidationError(string userId)
     {
         // ARRANGE
         var validator = new UpdatePermissionCommandValidator();
         var model = new UpdatePermissionCommand() { UserId = userId };
 
         // ACT
-        var result = validator.TestValidate(model);
+        var result = await validator.TestValidateAsync(model);
 
         // ASSERT
         result.ShouldHaveValidationErrorFor(x => x.UserId);
     }
 
     [Fact]
-    public void TestValidate_ValidIssueId_ValidationSuccess()
+    public async Task TestValidate_ValidIssueId_ValidationSuccess()
     {
         // ARRANGE
         var validator = new UpdatePermissionCommandValidator();
         var model = new UpdatePermissionCommand() { IssueId = "Issue_1" };
 
         // ACT
-        var result = validator.TestValidate(model);
+        var result = await validator.TestValidateAsync(model);
 
         // ASSERT
         result.ShouldNotHaveValidationErrorFor(x => x.IssueId);
@@ -53,14 +53,14 @@ public class UpdatePermissionCommandValidatorTests
     [Theory]
     [InlineData(null)]
     [InlineData("")]
-    public void TestValidate_InValidIssueId_ValidationError(string issueId)
+    public async Task TestValidate_InValidIssueId_ValidationError(string issueId)
     {
         // ARRANGE
         var validator = new UpdatePermissionCommandValidator();
         var model = new UpdatePermissionCommand() { IssueId = issueId };
 
         // ACT
-        var result = validator.TestValidate(model);
+        var result = await validator.TestValidateAsync(model);
 
         // ASSERT
         result.ShouldHaveValidationErrorFor(x => x.IssueId);

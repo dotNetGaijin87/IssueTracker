@@ -20,7 +20,7 @@ public class CreatePermissionCommandHandlerTests
     [InlineData(true, IssuePermission.None)]
     [InlineData(true, IssuePermission.CanModify)]
     [InlineData(false, IssuePermission.CanDelete)]
-    public async void Handle_ValidData_ReturnedAndSavedDataCorrect(bool isPinnedToKanban, IssuePermission issuePermission)
+    public async Task Handle_ValidData_ReturnedAndSavedDataCorrect(bool isPinnedToKanban, IssuePermission issuePermission)
     {
         // ARRANGE
         using AppDbContext dbContext = DbHelpers.GetDbWith3Users3Projects3Issues3permissions(default);
@@ -58,7 +58,7 @@ public class CreatePermissionCommandHandlerTests
     }
 
     [Fact]
-    public async void Handle_PermissionAlreadyExist_ThrowsException()
+    public async Task Handle_PermissionAlreadyExist_ThrowsException()
     {
         // ARRANGE
         using AppDbContext dbContext = DbHelpers.GetDbWith3Users3Projects3Issues3permissions(default);
@@ -91,7 +91,7 @@ public class CreatePermissionCommandHandlerTests
     }
 
     [Fact]
-    public async void Handle_ExceptionRaised_ThrowsException()
+    public async Task Handle_ExceptionRaised_ThrowsException()
     {
         // ARRANGE
         var dContext = new Mock<AppDbContext>();

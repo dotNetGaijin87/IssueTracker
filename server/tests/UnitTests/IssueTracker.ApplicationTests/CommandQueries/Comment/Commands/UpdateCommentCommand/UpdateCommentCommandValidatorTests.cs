@@ -7,14 +7,14 @@ namespace IssueTracker.ApplicationTests;
 public class UpdateCommentCommandValidatorTests
 {
     [Fact]
-    public void TestValidate_ValidId_ValidationSuccess()
+    public async Task TestValidate_ValidId_ValidationSuccess()
     {
         // ARRANGE
         var validator = new UpdateCommentCommandValidator();
         var model = new UpdateCommentCommand() { Id = "Comment_1" };
 
         // ACT
-        var result = validator.TestValidate(model);
+        var result = await validator.TestValidateAsync(model);
 
         // ASSERT
         result.ShouldNotHaveValidationErrorFor(x => x.Id);
@@ -23,28 +23,28 @@ public class UpdateCommentCommandValidatorTests
     [Theory]
     [InlineData(null)]
     [InlineData("")]
-    public void TestValidate_ValidId_ValidationError(string commentId)
+    public async Task TestValidate_ValidId_ValidationError(string commentId)
     {
         // ARRANGE
         var validator = new UpdateCommentCommandValidator();
         var model = new UpdateCommentCommand() { Id = commentId };
 
         // ACT
-        var result = validator.TestValidate(model);
+        var result = await validator.TestValidateAsync(model);
 
         // ASSERT
         result.ShouldHaveValidationErrorFor(x => x.Id);
     }
 
     [Fact]
-    public void TestValidate_ValidContent_ValidationSuccess()
+    public async Task TestValidate_ValidContent_ValidationSuccess()
     {
         // ARRANGE
         var validator = new UpdateCommentCommandValidator();
         var model = new UpdateCommentCommand() { Content = "Sample content" };
 
         // ACT
-        var result = validator.TestValidate(model);
+        var result = await validator.TestValidateAsync(model);
 
         // ASSERT
         result.ShouldNotHaveValidationErrorFor(x => x.Content);
@@ -53,14 +53,14 @@ public class UpdateCommentCommandValidatorTests
     [Theory]
     [InlineData(null)]
     [InlineData("")]
-    public void TestValidate_InvalidContent_ValidationError(string content)
+    public async Task TestValidate_InvalidContent_ValidationError(string content)
     {
         // ARRANGE
         var validator = new UpdateCommentCommandValidator();
         var model = new UpdateCommentCommand() { Content = content };
 
         // ACT
-        var result = validator.TestValidate(model);
+        var result = await validator.TestValidateAsync(model);
 
         // ASSERT
         result.ShouldHaveValidationErrorFor(x => x.Content);

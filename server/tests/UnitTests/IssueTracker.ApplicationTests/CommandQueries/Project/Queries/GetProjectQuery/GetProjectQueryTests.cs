@@ -16,7 +16,7 @@ namespace IssueTracker.ApplicationTests;
 public class GetProjectQueryTests
 {
     [Fact]
-    public async void Handle_ProjectExist_ReturnedDataCorrect()
+    public async Task Handle_ProjectExist_ReturnedDataCorrect()
     {
         // ARRANGE
         using AppDbContext dbContext = DbHelpers.GetEmptyDb(new DateTime(2001,1,1,12,30,5));
@@ -46,7 +46,7 @@ public class GetProjectQueryTests
     }
 
     [Fact]
-    public async void Handle_ProjectNotFound_ThrowsException()
+    public async Task Handle_ProjectNotFound_ThrowsException()
     {
         // ARRANGE
         using AppDbContext dbContext = DbHelpers.GetEmptyDb(DateTime.MinValue);
@@ -67,7 +67,7 @@ public class GetProjectQueryTests
     }
 
     [Fact]
-    public async void Handle_ThrowsException()
+    public async Task Handle_ThrowsException()
     {
         // ARRANGE
         var dContext = new Mock<AppDbContext>();

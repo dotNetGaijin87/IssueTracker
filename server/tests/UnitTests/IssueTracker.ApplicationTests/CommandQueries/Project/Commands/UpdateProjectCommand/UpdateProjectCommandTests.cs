@@ -20,7 +20,7 @@ public class UpdateProjectCommandTests
     [Theory]
     [InlineData(ProjectProgress.Open)]
     [InlineData(ProjectProgress.Closed)]
-    public async void Handle_ValidData_DbDataCorrect(ProjectProgress progress)
+    public async Task Handle_ValidData_DbDataCorrect(ProjectProgress progress)
     {
         // ARRANGE
         using AppDbContext dbContext = DbHelpers.GetEmptyDb(DateTime.MinValue);
@@ -59,7 +59,7 @@ public class UpdateProjectCommandTests
     [Theory]
     [InlineData(ProjectProgress.Open)]
     [InlineData(ProjectProgress.Closed)]
-    public async void Handle_ValidData_ReturnedDataCorrect(ProjectProgress progress)
+    public async Task Handle_ValidData_ReturnedDataCorrect(ProjectProgress progress)
     {
         // ARRANGE
         var mapper = AutoMapperHelpers.CreateAutoMapper();
@@ -97,7 +97,7 @@ public class UpdateProjectCommandTests
     }
 
     [Fact]
-    public async void Handle_ThrowsException()
+    public async Task Handle_ThrowsException()
     {
         // ARRANGE
         var dContext = new Mock<AppDbContext>();

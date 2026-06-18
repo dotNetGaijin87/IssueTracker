@@ -364,5 +364,7 @@ FodyWeavers.xsd
 
 
 # Setting files
-**/appsettings.json
+# Base appsettings.json holds non-secret defaults and IS committed.
+# Environment-specific settings (connection strings etc.) are local-only.
 **/appsettings.Development.json
+**/appsettings.*.local.json

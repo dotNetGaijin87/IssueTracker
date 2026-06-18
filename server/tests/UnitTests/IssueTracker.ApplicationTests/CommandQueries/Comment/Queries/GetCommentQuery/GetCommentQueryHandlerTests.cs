@@ -16,7 +16,7 @@ namespace IssueTracker.ApplicationTests;
 public class GetCommentQueryHandlerTests
 {
     [Fact]
-    public async void Handle_ValidRequest_ReturnsCorrectData()
+    public async Task Handle_ValidRequest_ReturnsCorrectData()
     {
         // ARRANGE
         using AppDbContext dbContext = DbHelpers.GetDbWith3Users3Projects3Issues3permissions(new DateTime(2000, 1, 1, 12, 0, 0));
@@ -49,7 +49,7 @@ public class GetCommentQueryHandlerTests
     }
 
     [Fact]
-    public async void Handle_ExceptionRaised_ThrowsException()
+    public async Task Handle_ExceptionRaised_ThrowsException()
     {
         // ARRANGE
         var dContext = new Mock<AppDbContext>();

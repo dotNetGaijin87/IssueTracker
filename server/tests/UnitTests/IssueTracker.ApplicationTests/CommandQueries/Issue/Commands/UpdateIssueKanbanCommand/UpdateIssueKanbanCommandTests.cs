@@ -25,7 +25,7 @@ public class UpdateIssueKanbanCommandTests
     [InlineData(IssueProgress.OnHold)]
     [InlineData(IssueProgress.ToBeTested)]
     [InlineData(IssueProgress.ToDo)]
-    public async void Handle_ValidData_SavesAndReturnsCorrectData(IssueProgress newProgress)
+    public async Task Handle_ValidData_SavesAndReturnsCorrectData(IssueProgress newProgress)
     {
         // ARRANGE
         AppDbContext dbContext = DbHelpers.GetEmptyDb(DateTime.MinValue);
@@ -106,7 +106,7 @@ public class UpdateIssueKanbanCommandTests
     }
 
     [Fact]
-    public async void Handle_ThrowsException()
+    public async Task Handle_ThrowsException()
     {
         // ARRANGE
         var dbContext = new Mock<AppDbContext>();

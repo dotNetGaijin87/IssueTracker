@@ -7,14 +7,14 @@ namespace IssueTracker.ApplicationTests;
 public class GetUserQueryValidatorTests
 {
     [Fact]
-    public void TestValidate_ValidId_ValidationSuccess()
+    public async Task TestValidate_ValidId_ValidationSuccess()
     {
         // ARRANGE
         var validator = new GetUserQueryValidator();
         var model = new GetUserQuery() { Id = "User_1" };
 
         // ACT
-        var result = validator.TestValidate(model);
+        var result = await validator.TestValidateAsync(model);
 
         // ASSERT
         result.ShouldNotHaveValidationErrorFor(x => x.Id);
@@ -23,14 +23,14 @@ public class GetUserQueryValidatorTests
     [Theory]
     [InlineData(null)]
     [InlineData("")]
-    public void TestValidate_InvalidId_ValidationError(string userId)
+    public async Task TestValidate_InvalidId_ValidationError(string userId)
     {
         // ARRANGE
         var validator = new GetUserQueryValidator();
         var model = new GetUserQuery() { Id = userId };
 
         // ACT
-        var result = validator.TestValidate(model);
+        var result = await validator.TestValidateAsync(model);
 
         // ASSERT
         result.ShouldHaveValidationErrorFor(x => x.Id);

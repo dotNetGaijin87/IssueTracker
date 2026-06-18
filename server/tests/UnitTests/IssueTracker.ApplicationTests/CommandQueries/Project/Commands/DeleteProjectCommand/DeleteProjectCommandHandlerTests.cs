@@ -17,7 +17,7 @@ namespace IssueTracker.ApplicationTests;
 public class DeleteProjectCommandHandlerTests
 {
     [Fact]
-    public async void Handle_ProjectExists_Success()
+    public async Task Handle_ProjectExists_Success()
     {
         // ARRANGE
         using AppDbContext dbContext = DbHelpers.GetEmptyDb(DateTime.MinValue);
@@ -39,7 +39,7 @@ public class DeleteProjectCommandHandlerTests
 
 
     [Fact]
-    public async void Handle_ProjectNotFound_ThrowsException()
+    public async Task Handle_ProjectNotFound_ThrowsException()
     {
         // ARRANGE
         using AppDbContext dbContext = DbHelpers.GetEmptyDb(DateTime.MinValue);
@@ -61,7 +61,7 @@ public class DeleteProjectCommandHandlerTests
 
 
     [Fact]
-    public async void Handle_ExceptionRaised_ThrowsException()
+    public async Task Handle_ExceptionRaised_ThrowsException()
     {
         // ARRANGE
         var dContext = new Mock<AppDbContext>();

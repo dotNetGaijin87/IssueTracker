@@ -1,0 +1,50 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  backend:
+    name: Backend (.NET 8)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Restore
+        run: dotnet restore IssueTracker.sln
+
+      - name: Build
+        run: dotnet build IssueTracker.sln -c Release --no-restore
+
+      - name: Unit tests
+        run: |
+          dotnet test server/tests/UnitTests/IssueTracker.ApplicationTests/IssueTracker.ApplicationTests.csproj -c Release --no-build --verbosity normal
+          dotnet test server/tests/UnitTests/IssueTracker.InfrastructureTests/IssueTracker.InfrastructureTests.csproj -c Release --no-build --verbosity normal
+
+  frontend:
+    name: Frontend (React 18 + Vite)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: client
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build
+        run: npm run build

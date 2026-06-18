@@ -14,7 +14,7 @@ public class DeleteIssueCommandValidatorTests
     [Theory]
     [InlineData(null)]
     [InlineData("")]
-    public void TestValidate_InValidId_ValidationError(string id)
+    public async Task TestValidate_InValidId_ValidationError(string id)
     {
         // ARRANGE
         using AppDbContext dbContext = DbHelpers.GetEmptyDb(DateTime.MinValue);
@@ -26,7 +26,7 @@ public class DeleteIssueCommandValidatorTests
         };
 
         // ACT
-        var result = validator.TestValidate(model);
+        var result = await validator.TestValidateAsync(model);
 
         // ASSERT
         result.ShouldHaveValidationErrorFor(x => x.Id);
@@ -36,7 +36,7 @@ public class DeleteIssueCommandValidatorTests
     [Theory]
     [InlineData(UserRole.admin)]
     [InlineData(UserRole.manager)]
-    public void TestValidate_ValidRole_ValidationSuccess(UserRole role)
+    public async Task TestValidate_ValidRole_ValidationSuccess(UserRole role)
     {
         // ARRANGE
         using AppDbContext dbContext = DbHelpers.GetEmptyDb(DateTime.MinValue);
@@ -44,7 +44,7 @@ public class DeleteIssueCommandValidatorTests
         var model = new DeleteIssueCommand() { UserCredentials = new UserCredentials { Role = role } };
 
         // ACT
-        var result = validator.TestValidate(model);
+        var result = await validator.TestValidateAsync(model);
 
         // ASSERT
         result.ShouldNotHaveValidationErrorFor(x => x.UserCredentials.Role);
@@ -52,7 +52,7 @@ public class DeleteIssueCommandValidatorTests
 
 
     [Fact]
-    public void TestValidate_UserCreatedTheIssue_ValidationSuccess()
+    public async Task TestValidate_UserCreatedTheIssue_ValidationSuccess()
     {
         // ARRANGE
         using AppDbContext dbContext = DbHelpers.GetEmptyDb(DateTime.MinValue);
@@ -70,7 +70,7 @@ public class DeleteIssueCommandValidatorTests
         };
 
         // ACT
-        var result = validator.TestValidate(model);
+        var result = await validator.TestValidateAsync(model);
 
         // ASSERT
         result.ShouldNotHaveValidationErrorFor(x => x);
@@ -78,7 +78,7 @@ public class DeleteIssueCommandValidatorTests
 
 
     [Fact]
-    public void TestValidate_UserDidNotCreateTheIssue_ValidationError()
+    public async Task TestValidate_UserDidNotCreateTheIssue_ValidationError()
     {
         // ARRANGE
         using AppDbContext dbContext = DbHelpers.GetEmptyDb(DateTime.MinValue);
@@ -97,7 +97,7 @@ public class DeleteIssueCommandValidatorTests
         };
 
         // ACT
-        var result = validator.TestValidate(model);
+        var result = await validator.TestValidateAsync(model);
 
         // ASSERT
         result.ShouldHaveValidationErrorFor(x => x);

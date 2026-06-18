@@ -13,7 +13,7 @@ public class AppDbContextTests
 {
 
     [Fact]
-    public async void SaveChangesAsync_ProjectProgressOpen_CreationTimeCorrect()
+    public async Task SaveChangesAsync_ProjectProgressOpen_CreationTimeCorrect()
     {
         // ARRANGE
         using AppDbContext dbContext = DbHelpers.GetEmptyDb(new DateTime(2005, 5, 5, 12, 0, 0));
@@ -36,7 +36,7 @@ public class AppDbContextTests
     }
 
     [Fact]
-    public async void SaveChangesAsync_ProjectProgressClosed_CompletionTimeCorrect()
+    public async Task SaveChangesAsync_ProjectProgressClosed_CompletionTimeCorrect()
     {
         // ARRANGE
         using AppDbContext dbContext = DbHelpers.GetEmptyDb(new DateTime(2005, 5, 5, 12, 0, 0));
@@ -63,7 +63,7 @@ public class AppDbContextTests
     [InlineData(IssueProgress.ToBeTested)]
     [InlineData(IssueProgress.OnHold)]
     [InlineData(IssueProgress.InProgress)]
-    public async void SaveChangesAsync_IssueNotDone_CompletionTimeNull(IssueProgress progress)
+    public async Task SaveChangesAsync_IssueNotDone_CompletionTimeNull(IssueProgress progress)
     {
         // ARRANGE
         using AppDbContext dbContext = DbHelpers.GetEmptyDb(new DateTime(2005, 6, 6, 12, 0, 0));
@@ -90,7 +90,7 @@ public class AppDbContextTests
     [Theory]
     [InlineData(IssueProgress.Canceled)]
     [InlineData(IssueProgress.Closed)]
-    public async void SaveChangesAsync_IssueDone_CompletionTimeNotNull(IssueProgress progress)
+    public async Task SaveChangesAsync_IssueDone_CompletionTimeNotNull(IssueProgress progress)
     {
         // ARRANGE
         using AppDbContext dbContext = DbHelpers.GetEmptyDb(new DateTime(2005, 6, 6, 12, 0, 0));
@@ -115,7 +115,7 @@ public class AppDbContextTests
     }
 
     [Fact]
-    public async void SaveChangesAsync_PermissionAdded_CreationTimeCorrect()
+    public async Task SaveChangesAsync_PermissionAdded_CreationTimeCorrect()
     {
         // ARRANGE
         using AppDbContext dbContext = DbHelpers.GetEmptyDb(new DateTime(2005, 5, 5, 12, 0, 0));

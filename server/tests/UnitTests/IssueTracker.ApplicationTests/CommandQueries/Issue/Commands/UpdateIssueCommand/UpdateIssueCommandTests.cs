@@ -24,7 +24,7 @@ public class UpdateIssueCommandTests
     [InlineData(IssueProgress.OnHold)]
     [InlineData(IssueProgress.ToBeTested)]
     [InlineData(IssueProgress.ToDo)]
-    public async void Handle_ValidData_DbDataCorrect(IssueProgress newProgress)
+    public async Task Handle_ValidData_DbDataCorrect(IssueProgress newProgress)
     {
         // ARRANGE
         using AppDbContext dbContext = DbHelpers.GetEmptyDb(DateTime.MinValue);
@@ -76,7 +76,7 @@ public class UpdateIssueCommandTests
     [InlineData(IssuePriority.Medium)]
     [InlineData(IssuePriority.High)]
     [InlineData(IssuePriority.Critical)]
-    public async void Handle_ValidData_ReturnedDataCorrect(IssuePriority newPriority)
+    public async Task Handle_ValidData_ReturnedDataCorrect(IssuePriority newPriority)
     {
         // ARRANGE
         using AppDbContext dbContext = DbHelpers.GetEmptyDb(DateTime.MinValue);
@@ -122,7 +122,7 @@ public class UpdateIssueCommandTests
     }
 
     [Fact]
-    public async void Handle_ThrowsException()
+    public async Task Handle_ThrowsException()
     {
         // ARRANGE
         var dContext = new Mock<AppDbContext>();

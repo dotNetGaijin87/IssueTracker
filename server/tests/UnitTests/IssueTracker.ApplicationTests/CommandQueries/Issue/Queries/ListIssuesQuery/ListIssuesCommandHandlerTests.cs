@@ -141,7 +141,7 @@ public class ListIssuesCommandHandlerTests
     [Theory]
     [InlineData(IssueType.Bug, 2)]
     [InlineData(IssueType.Improvement, 8)]
-    public async void Handle_FilteringByIssueType(IssueType type, int issueCount)
+    public async Task Handle_FilteringByIssueType(IssueType type, int issueCount)
     {
         // ARRANGE
         using AppDbContext dbContext = GetDbWith3Users2Projects10Issues(default);
@@ -164,7 +164,7 @@ public class ListIssuesCommandHandlerTests
     [InlineData(IssueProgress.OnHold, 1)]
     [InlineData(IssueProgress.Canceled, 3)]
     [InlineData(IssueProgress.Closed, 2)]
-    public async void Handle_FilteringByIssueProgress(IssueProgress progress, int issueCount)
+    public async Task Handle_FilteringByIssueProgress(IssueProgress progress, int issueCount)
     {
         // ARRANGE
         using AppDbContext dbContext = GetDbWith3Users2Projects10Issues(default);
@@ -185,7 +185,7 @@ public class ListIssuesCommandHandlerTests
     [InlineData(IssuePriority.Medium, 2)]
     [InlineData(IssuePriority.High, 4)]
     [InlineData(IssuePriority.Critical, 2)]
-    public async void Handle_FilteringByIssuePriority(IssuePriority priority, int issueCount)
+    public async Task Handle_FilteringByIssuePriority(IssuePriority priority, int issueCount)
     {
         // ARRANGE
         using AppDbContext dbContext = GetDbWith3Users2Projects10Issues(default);

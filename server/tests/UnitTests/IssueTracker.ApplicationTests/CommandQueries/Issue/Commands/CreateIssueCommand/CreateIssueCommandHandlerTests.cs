@@ -25,7 +25,7 @@ public class CreateIssueCommandHandlerTests
     [InlineData(IssueProgress.OnHold)]
     [InlineData(IssueProgress.Canceled)]
     [InlineData(IssueProgress.Closed)]
-    public async void Handle_VariousIssueProgress_ReturnedAndSavedDataCorrect(IssueProgress progress)
+    public async Task Handle_VariousIssueProgress_ReturnedAndSavedDataCorrect(IssueProgress progress)
     {
         // ARRANGE
         using AppDbContext dbContext = DbHelpers.GetDbWith3Users3Projects3Issues3permissions(new DateTime(2000, 1, 1, 12, 0, 0));
@@ -72,7 +72,7 @@ public class CreateIssueCommandHandlerTests
     [Theory]
     [InlineData(IssueType.Bug)]
     [InlineData(IssueType.Improvement)]
-    public async void Handle_VariousIssueType_ReturnedDataCorrect(IssueType type)
+    public async Task Handle_VariousIssueType_ReturnedDataCorrect(IssueType type)
     {
         // ARRANGE
         using AppDbContext dbContext = DbHelpers.GetDbWith3Users3Projects3Issues3permissions(new DateTime(2000, 1, 1, 12, 0, 0));
@@ -100,7 +100,7 @@ public class CreateIssueCommandHandlerTests
     [InlineData(IssuePriority.Medium)]
     [InlineData(IssuePriority.High)]
     [InlineData(IssuePriority.Critical)]
-    public async void Handle_VariousIssuePriority_ReturnedDataCorrect(IssuePriority priority)
+    public async Task Handle_VariousIssuePriority_ReturnedDataCorrect(IssuePriority priority)
     {
         // ARRANGE
         using AppDbContext dbContext = DbHelpers.GetDbWith3Users3Projects3Issues3permissions(new DateTime(2000, 1, 1, 12, 0, 0));
@@ -125,7 +125,7 @@ public class CreateIssueCommandHandlerTests
     }
 
     [Fact]
-    public async void Handle_CorrectPermissionsAreSaved()
+    public async Task Handle_CorrectPermissionsAreSaved()
     {
         // ARRANGE
         using AppDbContext dbContext = DbHelpers.GetDbWith3Users3Projects3Issues3permissions(new DateTime(2002, 1, 1, 12, 0, 0));
@@ -167,7 +167,7 @@ public class CreateIssueCommandHandlerTests
     }
 
     [Fact]
-    public async void Handle_IssueAlreadyExist_ThrowsException()
+    public async Task Handle_IssueAlreadyExist_ThrowsException()
     {
         // ARRANGE
         using AppDbContext dbContext = DbHelpers.GetDbWith3Users3Projects3Issues3permissions(default);
@@ -194,7 +194,7 @@ public class CreateIssueCommandHandlerTests
     }
 
     [Fact]
-    public async void Handle_ExceptionRaised_ThrowsException()
+    public async Task Handle_ExceptionRaised_ThrowsException()
     {
         // ARRANGE
         var dContext = new Mock<AppDbContext>();

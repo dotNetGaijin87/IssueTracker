@@ -8,14 +8,14 @@ namespace IssueTracker.ApplicationTests
     {
 
         [Fact]
-        public void TestValidate_ValidId_ValidationSuccess()
+        public async Task TestValidate_ValidId_ValidationSuccess()
         {
             // ARRANGE
             var validator = new GetProjectQueryValidator();
             var model = new GetProjectQuery() { Id = "Project_1" };
 
             // ACT
-            var result = validator.TestValidate(model);
+            var result = await validator.TestValidateAsync(model);
 
             // ASSERT
             result.ShouldNotHaveValidationErrorFor(x => x.Id);
@@ -24,14 +24,14 @@ namespace IssueTracker.ApplicationTests
         [Theory]
         [InlineData(null)]
         [InlineData("")]
-        public void TestValidate_InvalidId_ValidationError(string projectId)
+        public async Task TestValidate_InvalidId_ValidationError(string projectId)
         {
             // ARRANGE
             var validator = new GetProjectQueryValidator();
             var model = new GetProjectQuery() { Id = projectId };
 
             // ACT
-            var result = validator.TestValidate(model);
+            var result = await validator.TestValidateAsync(model);
 
             // ASSERT
             result.ShouldHaveValidationErrorFor(x => x.Id);

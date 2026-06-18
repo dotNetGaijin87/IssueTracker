@@ -16,7 +16,7 @@ namespace IssueTracker.ApplicationTests;
 public class DeleteCommentCommandHandlerTests
 {
     [Fact]
-    public async void Handle_ValidRequest_DataDeleted()
+    public async Task Handle_ValidRequest_DataDeleted()
     {
         // ARRANGE
         using AppDbContext dbContext = DbHelpers.GetDbWith3Users3Projects3Issues3permissions(new DateTime(2002, 1, 1, 12, 0, 0));
@@ -46,7 +46,7 @@ public class DeleteCommentCommandHandlerTests
     }
 
     [Fact]
-    public async void Handle_ExceptionRaised_ThrowsException()
+    public async Task Handle_ExceptionRaised_ThrowsException()
     {
         // ARRANGE
         var dContext = new Mock<AppDbContext>();

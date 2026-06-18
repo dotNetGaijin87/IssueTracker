@@ -28,7 +28,9 @@ export const Auth0Context = React.createContext<IAuth0Context>({
 
 export const useAuth = () => React.useContext(Auth0Context);
 
-export const AuthProvider: React.FC = ({ children }) => {
+export const AuthProvider: React.FC<React.PropsWithChildren> = ({
+  children
+}) => {
   const [isAuthenticated, setIsAuthenticated] = React.useState<boolean>(false);
   const [authUser, setAuthUser] = React.useState<Auth0User | undefined>(
     undefined

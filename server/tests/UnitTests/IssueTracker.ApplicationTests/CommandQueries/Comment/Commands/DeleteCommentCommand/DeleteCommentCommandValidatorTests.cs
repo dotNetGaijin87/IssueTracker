@@ -9,14 +9,14 @@ public class DeleteCommentCommandValidatorTests
     [Theory]
     [InlineData("Comment_1")]
     [InlineData("Issue_1_Comment_1")]
-    public void TestValidate_ValidId_ValidationSuccess(string commentId)
+    public async Task TestValidate_ValidId_ValidationSuccess(string commentId)
     {
         // ARRANGE
         var validator = new DeleteCommentCommandValidator();
         var model = new DeleteCommentCommand() { Id = commentId };
 
         // ACT
-        var result = validator.TestValidate(model);
+        var result = await validator.TestValidateAsync(model);
 
         // ASSERT
         result.ShouldNotHaveValidationErrorFor(x => x.Id);
@@ -25,14 +25,14 @@ public class DeleteCommentCommandValidatorTests
     [Theory]
     [InlineData(null)]
     [InlineData("")]
-    public void TestValidate_ValidId_ValidationError(string commentId)
+    public async Task TestValidate_ValidId_ValidationError(string commentId)
     {
         // ARRANGE
         var validator = new DeleteCommentCommandValidator();
         var model = new DeleteCommentCommand() { Id = commentId };
 
         // ACT
-        var result = validator.TestValidate(model);
+        var result = await validator.TestValidateAsync(model);
 
         // ASSERT
         result.ShouldHaveValidationErrorFor(x => x.Id);

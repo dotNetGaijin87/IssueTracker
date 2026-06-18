@@ -7,7 +7,7 @@ import {
   TextField,
   Typography
 } from '@mui/material';
-import { useParams } from 'react-router';
+import { useParams } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import LoadingPage from '../../../layout/common/LoadingPage';
 import { adapter } from '../../../adapters/adapter';

@@ -12,7 +12,7 @@ namespace IssueTracker.ApplicationTests;
 public class DeleteProjectCommandValidatorTests
 {
     [Fact]
-    public void TestValidate_AdminRole_ValidationSuccess()
+    public async Task TestValidate_AdminRole_ValidationSuccess()
     {
         // ARRANGE
         using AppDbContext dbContext = DbHelpers.GetEmptyDb(DateTime.MinValue);
@@ -20,7 +20,7 @@ public class DeleteProjectCommandValidatorTests
         var model = new DeleteProjectCommand() { UserCredentials = new UserCredentials { Role = UserRole.admin } };
 
         // ACT
-        var result = validator.TestValidate(model);
+        var result = await validator.TestValidateAsync(model);
 
         // ASSERT
         result.ShouldNotHaveValidationErrorFor(x => x.UserCredentials.Role);
@@ -28,7 +28,7 @@ public class DeleteProjectCommandValidatorTests
 
 
     [Fact]
-    public void TestValidate_UserWhoCreatedTheProjectWithManagerRole_ValidationSuccess()
+    public async Task TestValidate_UserWhoCreatedTheProjectWithManagerRole_ValidationSuccess()
     {
         // ARRANGE
         using AppDbContext dbContext = DbHelpers.GetEmptyDb(DateTime.MinValue);
@@ -43,7 +43,7 @@ public class DeleteProjectCommandValidatorTests
         };
 
         // ACT
-        var result = validator.TestValidate(model);
+        var result = await validator.TestValidateAsync(model);
 
         // ASSERT
         result.ShouldNotHaveValidationErrorFor(x => x);
@@ -52,7 +52,7 @@ public class DeleteProjectCommandValidatorTests
 
     [Theory]
     [InlineData(UserRole.employee)]
-    public void TestValidate_UnauthorizedRole_ValidationError(UserRole role)
+    public async Task TestValidate_UnauthorizedRole_ValidationError(UserRole role)
     {
         // ARRANGE
         using AppDbContext dbContext = DbHelpers.GetEmptyDb(DateTime.MinValue);
@@ -60,7 +60,7 @@ public class DeleteProjectCommandValidatorTests
         var model = new DeleteProjectCommand() { UserCredentials = new UserCredentials { Role = role }  };
 
         // ACT
-        var result = validator.TestValidate(model);
+        var result = await validator.TestValidateAsync(model);
 
         // ASSERT
         result.ShouldHaveValidationErrorFor(x => x.UserCredentials.Role);
@@ -70,7 +70,7 @@ public class DeleteProjectCommandValidatorTests
     [Theory]
     [InlineData(null)]
     [InlineData("")]
-    public void TestValidate_InValidId_ValidationError(string id)
+    public async Task TestValidate_InValidId_ValidationError(string id)
     {
         // ARRANGE
         using AppDbContext dbContext = DbHelpers.GetEmptyDb(DateTime.MinValue);
@@ -78,7 +78,7 @@ public class DeleteProjectCommandValidatorTests
         var model = new DeleteProjectCommand() { Id = id };
 
         // ACT
-        var result = validator.TestValidate(model);
+        var result = await validator.TestValidateAsync(model);
 
         // ASSERT
         result.ShouldHaveValidationErrorFor(x => x.Id);

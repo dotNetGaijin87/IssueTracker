@@ -66,7 +66,7 @@ public class ListCommentsQueryHandlerTests
     [InlineData(2)]
     [InlineData(5)]
     [InlineData(10)]
-    public async void Handle_PageSizeSmallerThanAllRecords_RecordsReturnedEqualsPageSize(int pageSize)
+    public async Task Handle_PageSizeSmallerThanAllRecords_RecordsReturnedEqualsPageSize(int pageSize)
     {
         // ARRANGE
         AppDbContext dbContext = await GetDbSeededWith13Comments();
@@ -84,7 +84,7 @@ public class ListCommentsQueryHandlerTests
     [Theory]
     [InlineData(15)]
     [InlineData(20)]
-    public async void Handle_PageSizeGreaterThanAllRecords_PageCountEquals1(int pageSize)
+    public async Task Handle_PageSizeGreaterThanAllRecords_PageCountEquals1(int pageSize)
     {
         // ARRANGE
         AppDbContext dbContext = await GetDbSeededWith13Comments();
@@ -101,7 +101,7 @@ public class ListCommentsQueryHandlerTests
     }
 
     [Fact]
-    public async void Handle_SecondaPage_Returns3Comments()
+    public async Task Handle_SecondaPage_Returns3Comments()
     {
         // ARRANGE
         AppDbContext dbContext = await GetDbSeededWith13Comments();
@@ -118,7 +118,7 @@ public class ListCommentsQueryHandlerTests
     }
 
     [Fact]
-    public async void Handle_ThrowsException()
+    public async Task Handle_ThrowsException()
     {
         // ARRANGE
         var dContext = new Mock<AppDbContext>();

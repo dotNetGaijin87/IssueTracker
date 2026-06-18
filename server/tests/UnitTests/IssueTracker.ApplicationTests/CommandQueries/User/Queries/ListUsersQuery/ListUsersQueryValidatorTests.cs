@@ -10,14 +10,14 @@ namespace IssueTracker.ApplicationTests
         [Theory]
         [InlineData(1)]
         [InlineData(10)]
-        public void TestValidate_PageGreaterThanZero_ValidationSuccess(int page)
+        public async Task TestValidate_PageGreaterThanZero_ValidationSuccess(int page)
         {
             // ARRANGE
             var validator = new ListUsersQueryValidator();
             var model = new ListUsersQuery() { Page = page };
 
             // ACT
-            var result = validator.TestValidate(model);
+            var result = await validator.TestValidateAsync(model);
 
             // ASSERT
             result.ShouldNotHaveValidationErrorFor(x => x.Page);
@@ -26,14 +26,14 @@ namespace IssueTracker.ApplicationTests
         [Theory]
         [InlineData(-1)]
         [InlineData(0)]
-        public void TestValidate_PageNotGreaterThanZero_ValidationError(int page)
+        public async Task TestValidate_PageNotGreaterThanZero_ValidationError(int page)
         {
             // ARRANGE
             var validator = new ListUsersQueryValidator();
             var model = new ListUsersQuery() { Page = page };
 
             // ACT
-            var result = validator.TestValidate(model);
+            var result = await validator.TestValidateAsync(model);
 
             // ASSERT
             result.ShouldHaveValidationErrorFor(x => x.Page);
@@ -43,14 +43,14 @@ namespace IssueTracker.ApplicationTests
         [InlineData(1)]
         [InlineData(10)]
         [InlineData(20)]
-        public void TestValidate_PageSizeGreaterThanOne_ValidationSuccess(int pageSize)
+        public async Task TestValidate_PageSizeGreaterThanOne_ValidationSuccess(int pageSize)
         {
             // ARRANGE
             var validator = new ListUsersQueryValidator();
             var model = new ListUsersQuery() { PageSize = pageSize };
 
             // ACT
-            var result = validator.TestValidate(model);
+            var result = await validator.TestValidateAsync(model);
 
             // ASSERT
             result.ShouldNotHaveValidationErrorFor(x => x.PageSize);
@@ -59,14 +59,14 @@ namespace IssueTracker.ApplicationTests
         [Theory]
         [InlineData(-1)]
         [InlineData(21)]
-        public void TestValidate_PageSizeInvalid_ValidationError(int pageSize)
+        public async Task TestValidate_PageSizeInvalid_ValidationError(int pageSize)
         {
             // ARRANGE
             var validator = new ListUsersQueryValidator();
             var model = new ListUsersQuery() { PageSize = pageSize };
 
             // ACT
-            var result = validator.TestValidate(model);
+            var result = await validator.TestValidateAsync(model);
 
             // ASSERT
             result.ShouldHaveValidationErrorFor(x => x.PageSize);

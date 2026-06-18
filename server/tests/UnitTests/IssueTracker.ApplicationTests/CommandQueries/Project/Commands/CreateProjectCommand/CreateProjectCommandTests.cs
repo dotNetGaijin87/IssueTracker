@@ -19,7 +19,7 @@ public class CreateProjectCommandHandlerTests
     [Theory]
     [InlineData(ProjectProgress.Open)]
     [InlineData(ProjectProgress.Closed)]
-    public async void Handle_ValidData_DbDataCorrect(ProjectProgress progress)
+    public async Task Handle_ValidData_DbDataCorrect(ProjectProgress progress)
     {
         // ARRANGE
         using AppDbContext dbContext = DbHelpers.GetEmptyDb(new DateTime(2000, 1, 1, 12, 0, 0));
@@ -50,7 +50,7 @@ public class CreateProjectCommandHandlerTests
     [Theory]
     [InlineData(ProjectProgress.Open)]
     [InlineData(ProjectProgress.Closed)]
-    public async void Handle_ValidData_ReturnsCorrectData(ProjectProgress progress)
+    public async Task Handle_ValidData_ReturnsCorrectData(ProjectProgress progress)
     {
         // ARRANGE
         using AppDbContext dbContext = DbHelpers.GetEmptyDb(new DateTime(2000, 1, 1, 12, 0, 0));
@@ -79,7 +79,7 @@ public class CreateProjectCommandHandlerTests
     }
 
     [Fact]
-    public async void Handle_ProjectAlreadyExists_ThrowsException()
+    public async Task Handle_ProjectAlreadyExists_ThrowsException()
     {
         // ARRANGE
         using AppDbContext dbContext = DbHelpers.GetEmptyDb(DateTime.MinValue);
@@ -112,7 +112,7 @@ public class CreateProjectCommandHandlerTests
     }
 
     [Fact]
-    public async void Handle_ExceptionRaised_ThrowsException()
+    public async Task Handle_ExceptionRaised_ThrowsException()
     {
         // ARRANGE
         var dContext = new Mock<AppDbContext>();
