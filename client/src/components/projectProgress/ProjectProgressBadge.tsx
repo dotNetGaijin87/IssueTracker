@@ -1,4 +1,4 @@
-import { ProjectProgress } from '../../models/project/projectProgress';
+import { ProjectProgress } from '@/models/project/projectProgress';
 import projectProgressList from './projectProgress/projectProgressList';
 
 interface Props {

@@ -6,10 +6,10 @@ import {
   TableHead,
   TableRow
 } from '@mui/material';
-import TableContainer from '../../components/tableContainer/TableContainer';
-import { useAuth } from '../../authentication/Auth';
-import { User } from '../../models/user/user';
-import { UserRole } from '../../models/user/userRole';
+import TableContainer from '@/components/tableContainer/TableContainer';
+import { useAuth } from '@/authentication/Auth';
+import { User } from '@/models/user/user';
+import { UserRole } from '@/models/user/userRole';
 import UserDataRow from './UserDataRow';
 
 interface Props {

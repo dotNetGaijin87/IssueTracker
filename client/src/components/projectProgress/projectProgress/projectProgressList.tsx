@@ -1,6 +1,6 @@
 import { Box, Typography } from '@mui/material';
-import { ProjectProgress } from '../../../models/project/projectProgress';
-import BaseBadge from '../../baseBadge/BaseBadge';
+import { ProjectProgress } from '@/models/project/projectProgress';
+import BaseBadge from '@/components/baseBadge/BaseBadge';
 
 const projectProgressList = (borderless: boolean | undefined) => [
   {

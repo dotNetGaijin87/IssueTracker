@@ -1,5 +1,5 @@
 import { FormControl, InputLabel, MenuItem, Select } from '@mui/material';
-import { ProjectProgress } from '../../models/project/projectProgress';
+import { ProjectProgress } from '@/models/project/projectProgress';
 import projectProgressList from './projectProgress/projectProgressList';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import { useState } from 'react';
@@ -26,7 +26,7 @@ function ProjectProgressSelect({
   const [value, setValue] = useState(defaultValue);
 
   const update = (e: any) => {
-    let value = e.target.value;
+    const value = e.target.value;
 
     setValue(value);
     if (onChange) {

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, Button, Dialog, DialogActions, DialogTitle } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
-import TooltipActionButton from '../tooltipActionButton/TooltipActionButton';
+import TooltipActionButton from '@/components/tooltipActionButton/TooltipActionButton';
 
 interface Props {
   hoverOverTitle: string;

@@ -1,4 +1,4 @@
-import { IssueType } from '../../models/issue/issueType';
+import { IssueType } from '@/models/issue/issueType';
 import issueTypeList from './issueType/issueTypeList';
 
 interface Props {

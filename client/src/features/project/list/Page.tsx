@@ -9,15 +9,16 @@ import {
   TableHead,
   TableRow
 } from '@mui/material';
-import { adapter } from '../../../adapters/adapter';
-import LoadingPage from '../../../layout/common/LoadingPage';
-import { Project } from '../../../models/project/project';
+import { adapter } from '@/adapters/adapter';
+import displayError from '@/helpers/errorHandling/displayError';
+import LoadingPage from '@/layout/common/LoadingPage';
+import { Project } from '@/models/project/project';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import { Link } from 'react-router-dom';
-import safelyConvertDateTime from '../../../helpers/time/safelyConvertDateTime';
-import TableContainer from '../../../components/tableContainer/TableContainer';
-import ProjectProgressBadge from '../../../components/projectProgress/ProjectProgressBadge';
-import Pagination from '../../../components/pagination/Pagination';
+import safelyConvertDateTime from '@/helpers/time/safelyConvertDateTime';
+import TableContainer from '@/components/tableContainer/TableContainer';
+import ProjectProgressBadge from '@/components/projectProgress/ProjectProgressBadge';
+import Pagination from '@/components/pagination/Pagination';
 
 interface ProjectList {
   projects: Project[];
@@ -38,11 +39,13 @@ function ProjectListPage() {
     const run = async () => {
       try {
         setLoading(true);
-        let projectList = (await adapter.Project.list(
+        const projectList = (await adapter.Project.list(
           searchCriteria
         )) as ProjectList;
         setProjectList(projectList);
-      } catch (ex) {}
+      } catch (ex) {
+        displayError(ex, 'Loading projects failed');
+      }
       setLoading(false);
     };
 

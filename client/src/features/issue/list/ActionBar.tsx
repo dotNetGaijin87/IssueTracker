@@ -2,16 +2,16 @@ import React, { useEffect } from 'react';
 import { Box, Grow, TextField } from '@mui/material';
 import AutorenewOutlinedIcon from '@mui/icons-material/AutorenewOutlined';
 import AddNewIssue from './AddNewIssue';
-import IssueProgressSelect from '../../../components/issueProgress/IssueProgressSelect';
-import IssuePrioritySelect from '../../../components/issuePriority/IssuePrioritySelect';
-import Field from '../../../components/field/Field';
-import Bar from '../../../components/bar/Bar';
-import delayExec from '../../../helpers/delayExec';
-import TooltipActionButton from '../../../components/tooltipActionButton/TooltipActionButton';
-import { IssueType } from '../../../models/issue/issueType';
-import IssueTypeSelect from '../../../components/issueType/IssueTypeSelect';
-import { IssueProgress } from '../../../models/issue/issueProgress';
-import { IssuePriority } from '../../../models/issue/issuePriority';
+import IssueProgressSelect from '@/components/issueProgress/IssueProgressSelect';
+import IssuePrioritySelect from '@/components/issuePriority/IssuePrioritySelect';
+import Field from '@/components/field/Field';
+import Bar from '@/components/bar/Bar';
+import delayExec from '@/helpers/delayExec';
+import TooltipActionButton from '@/components/tooltipActionButton/TooltipActionButton';
+import { IssueType } from '@/models/issue/issueType';
+import IssueTypeSelect from '@/components/issueType/IssueTypeSelect';
+import { IssueProgress } from '@/models/issue/issueProgress';
+import { IssuePriority } from '@/models/issue/issuePriority';
 
 interface Props {
   onSearch: (value: IssueListSearchCriteria) => void;
@@ -45,7 +45,7 @@ function ActionBar({ onSearch }: Props) {
       return;
     }
     setUpdateData(false);
-    let search: any = {
+    const search: any = {
       name: name,
       createdBy: createdBy,
       Type: issueType === IssueType.Unspecified ? undefined : issueType,
@@ -55,6 +55,7 @@ function ActionBar({ onSearch }: Props) {
         issuePriority === IssuePriority.Unspecified ? undefined : issuePriority
     };
     return delayExec(() => onSearch({ ...search }), 1500);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [name, createdBy, issuePriority, issueProgress, issueType, updateData]);
 
   return (

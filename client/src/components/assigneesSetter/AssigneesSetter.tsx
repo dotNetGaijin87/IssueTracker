@@ -12,9 +12,9 @@ import {
 } from '@mui/material';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckIcon from '@mui/icons-material/Check';
-import { adapter } from '../../adapters/adapter';
-import delayExec from '../../helpers/delayExec';
-import { IssuePermission } from '../../models/issue/issuePermission';
+import { adapter } from '@/adapters/adapter';
+import delayExec from '@/helpers/delayExec';
+import { IssuePermission } from '@/models/issue/issuePermission';
 
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckIcon fontSize="small" />;
@@ -46,7 +46,7 @@ export default function AssigneesSetter({
       let usersWithPermissions: string[] = [];
       let searchedUsers: string[] = [];
       if (!isNewIssue) {
-        let userPermissionList = await adapter.Permission.list({ issueId });
+        const userPermissionList = await adapter.Permission.list({ issueId });
         usersWithPermissions = userPermissionList.permissions.map(
           (x: any) => x.userId
         );
@@ -68,6 +68,7 @@ export default function AssigneesSetter({
       onChange(usersWithPermissions);
       setLoading(false);
     }, 1500);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [issueId, search]);
 
   const updateUserIssueRelationship = async (
@@ -84,14 +85,14 @@ export default function AssigneesSetter({
           isPinnedToKanban: true
         });
       }
-      let newUsersWithClaim = [
+      const newUsersWithClaim = [
         ...usersWithPermissions,
         option[option.length - 1]
       ];
       setUsersWithPermissions(newUsersWithClaim);
       onChange(newUsersWithClaim);
     } else if (reason === 'removeOption') {
-      let removedUser = usersWithPermissions.filter(
+      const removedUser = usersWithPermissions.filter(
         (x) => !option.includes(x)
       )[0];
       if (!isNewIssue) {
@@ -138,7 +139,7 @@ export default function AssigneesSetter({
       clearIcon={<></>}
       renderTags={(value, getTagProps) => (
         <AvatarGroup max={3} {...getTagProps}>
-          {value.map((option, index) => (
+          {value.map((option) => (
             <Avatar key={option} sx={{ width: '24px', height: '24px' }}>
               {option.substring(0, 2)}
             </Avatar>

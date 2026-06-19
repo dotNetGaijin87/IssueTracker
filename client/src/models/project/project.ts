@@ -1,4 +1,4 @@
-import { Issue } from '../issue/issue';
+import { Issue } from '@/models/issue/issue';
 import { ProjectProgress } from './projectProgress';
 
 export type Project = {

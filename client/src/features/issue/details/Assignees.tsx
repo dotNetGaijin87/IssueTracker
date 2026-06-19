@@ -1,7 +1,7 @@
-import AssigneesSetter from '../../../components/assigneesSetter/AssigneesSetter';
-import Panel from '../../../components/panel/Panel';
-import { Issue } from '../../../models/issue/issue';
-import { IssuePermission } from '../../../models/issue/issuePermission';
+import AssigneesSetter from '@/components/assigneesSetter/AssigneesSetter';
+import Panel from '@/components/panel/Panel';
+import { Issue } from '@/models/issue/issue';
+import { IssuePermission } from '@/models/issue/issuePermission';
 
 interface Props {
   issue: Issue | undefined;
@@ -17,7 +17,7 @@ function Assignees({ issue, permissions }: Props) {
         <AssigneesSetter
           issueId={issue?.id}
           disabled={!canModifyPermission}
-          onChange={(responsibleBy) => {}}
+          onChange={() => {}}
         />
       </div>
     </Panel>

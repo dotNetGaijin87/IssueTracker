@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { Box } from '@mui/material';
 import { useParams } from 'react-router-dom';
-import Pagination from '../../../components/pagination/Pagination';
-import Comment from '../../../components/comment/Comment';
-import { IssuePermission } from '../../../models/issue/issuePermission';
-import { IssueComment } from '../../../models/comment/issueComment';
-import { adapter } from '../../../adapters/adapter';
-import LoadingPage from '../../../layout/common/LoadingPage';
-import AddComment from '../../../components/addComment/AddComment';
-import displayError from '../../../helpers/errorHandling/displayError';
+import Pagination from '@/components/pagination/Pagination';
+import Comment from '@/components/comment/Comment';
+import { IssuePermission } from '@/models/issue/issuePermission';
+import { IssueComment } from '@/models/comment/issueComment';
+import { adapter } from '@/adapters/adapter';
+import LoadingPage from '@/layout/common/LoadingPage';
+import AddComment from '@/components/addComment/AddComment';
+import displayError from '@/helpers/errorHandling/displayError';
 
 interface Props {
   permissions: IssuePermission[];
@@ -29,7 +29,7 @@ function IssueDetailsComments({ permissions }: Props) {
     const run = async () => {
       try {
         setLoading(true);
-        let commentVm = await adapter.Comment.list(searchCriteria);
+        const commentVm = await adapter.Comment.list(searchCriteria);
         setComments(commentVm.comments);
         setPage(commentVm.page);
         setPageCount(commentVm.pageCount);

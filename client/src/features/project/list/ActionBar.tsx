@@ -2,14 +2,14 @@ import React, { useEffect } from 'react';
 import { Box, Grow, TextField } from '@mui/material';
 import AutorenewOutlinedIcon from '@mui/icons-material/AutorenewOutlined';
 import AddNewProject from './AddNewProject';
-import { ProjectProgress } from '../../../models/project/projectProgress';
-import delayExec from '../../../helpers/delayExec';
-import TooltipActionButton from '../../../components/tooltipActionButton/TooltipActionButton';
-import Bar from '../../../components/bar/Bar';
-import Field from '../../../components/field/Field';
-import ProjectProgressSelect from '../../../components/projectProgress/ProjectProgressSelect';
-import { useAuth } from '../../../authentication/Auth';
-import { UserRole } from '../../../models/user/userRole';
+import { ProjectProgress } from '@/models/project/projectProgress';
+import delayExec from '@/helpers/delayExec';
+import TooltipActionButton from '@/components/tooltipActionButton/TooltipActionButton';
+import Bar from '@/components/bar/Bar';
+import Field from '@/components/field/Field';
+import ProjectProgressSelect from '@/components/projectProgress/ProjectProgressSelect';
+import { useAuth } from '@/authentication/Auth';
+import { UserRole } from '@/models/user/userRole';
 
 interface Props {
   onSearch: (value: object) => void;
@@ -31,12 +31,13 @@ function ActionBar({ onSearch }: Props) {
       return;
     }
     setUpdateData(false);
-    let search: any = {
+    const search: any = {
       progress: progress,
       id: id,
       createdBy: createdBy
     };
     return delayExec(() => onSearch({ ...search }), 1500);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [createdBy, id, updateData, progress]);
 
   return (

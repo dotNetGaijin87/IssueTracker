@@ -1,6 +1,6 @@
-import { IssuePriority } from '../issue/issuePriority';
-import { IssueProgress } from '../issue/issueProgress';
-import { IssueType } from '../issue/issueType';
+import { IssuePriority } from '@/models/issue/issuePriority';
+import { IssueProgress } from '@/models/issue/issueProgress';
+import { IssueType } from '@/models/issue/issueType';
 
 export type KanbanCard = {
   id: string;

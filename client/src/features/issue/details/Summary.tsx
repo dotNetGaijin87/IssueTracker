@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Box, Divider, Grow, TextField, Typography } from '@mui/material';
 import { useParams } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
-import { adapter } from '../../../adapters/adapter';
+import { adapter } from '@/adapters/adapter';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SaveIcon from '@mui/icons-material/Save';
 import EditIcon from '@mui/icons-material/Edit';
@@ -10,29 +10,29 @@ import BookmarkAddIcon from '@mui/icons-material/BookmarkAdd';
 import BookmarkRemoveIcon from '@mui/icons-material/BookmarkRemove';
 import CancelIcon from '@mui/icons-material/Cancel';
 import { toast } from 'react-toastify';
-import displayError from '../../../helpers/errorHandling/displayError';
+import displayError from '@/helpers/errorHandling/displayError';
 import { Controller, useForm } from 'react-hook-form';
-import FormFieldWrapper from '../../../components/formFieldWrapper/FormFieldWrapper';
-import safelyConvertDateTime from '../../../helpers/time/safelyConvertDateTime';
-import MarkupEditor from '../../../components/markupEditor/MarkupEditor';
-import Panel from '../../../components/panel/Panel';
-import TooltipActionButton from '../../../components/tooltipActionButton/TooltipActionButton';
-import ButtonIconWithConfirmationDialog from '../../../components/buttonIconWithConfirmationDialog/ButtonIconWithConfirmationDialog';
-import { Issue } from '../../../models/issue/issue';
-import { IssueProgress } from '../../../models/issue/issueProgress';
-import IssueProgressBadge from '../../../components/issueProgress/IssueProgressBadge';
-import IssueProgressSelect from '../../../components/issueProgress/IssueProgressSelect';
-import { IssueType } from '../../../models/issue/issueType';
-import IssueTypeSelect from '../../../components/issueType/IssueTypeSelect';
-import { IssuePriority } from '../../../models/issue/issuePriority';
-import IssuePrioritySelect from '../../../components/issuePriority/IssuePrioritySelect';
-import IssuePriorityBadge from '../../../components/issuePriority/IssuePriorityBadge';
-import VerticalDivider from '../../../components/verticalDivider/VerticalDivider';
-import { IssuePermission } from '../../../models/issue/issuePermission';
-import { useAuth } from '../../../authentication/Auth';
-import { Permission } from '../../../models/permission/permission';
-import hasAdminOrManagerRole from '../../../helpers/auth/hasAdminOrManagerRole';
-import parseDateTimeToMessage from '../../../helpers/time/parseDateTimeToMessage';
+import FormFieldWrapper from '@/components/formFieldWrapper/FormFieldWrapper';
+import safelyConvertDateTime from '@/helpers/time/safelyConvertDateTime';
+import MarkupEditor from '@/components/markupEditor/MarkupEditor';
+import Panel from '@/components/panel/Panel';
+import TooltipActionButton from '@/components/tooltipActionButton/TooltipActionButton';
+import ButtonIconWithConfirmationDialog from '@/components/buttonIconWithConfirmationDialog/ButtonIconWithConfirmationDialog';
+import { Issue } from '@/models/issue/issue';
+import { IssueProgress } from '@/models/issue/issueProgress';
+import IssueProgressBadge from '@/components/issueProgress/IssueProgressBadge';
+import IssueProgressSelect from '@/components/issueProgress/IssueProgressSelect';
+import { IssueType } from '@/models/issue/issueType';
+import IssueTypeSelect from '@/components/issueType/IssueTypeSelect';
+import { IssuePriority } from '@/models/issue/issuePriority';
+import IssuePrioritySelect from '@/components/issuePriority/IssuePrioritySelect';
+import IssuePriorityBadge from '@/components/issuePriority/IssuePriorityBadge';
+import VerticalDivider from '@/components/verticalDivider/VerticalDivider';
+import { IssuePermission } from '@/models/issue/issuePermission';
+import { useAuth } from '@/authentication/Auth';
+import { Permission } from '@/models/permission/permission';
+import hasAdminOrManagerRole from '@/helpers/auth/hasAdminOrManagerRole';
+import parseDateTimeToMessage from '@/helpers/time/parseDateTimeToMessage';
 
 interface Props {
   issue: Issue | undefined;
@@ -52,7 +52,7 @@ function IssueDetailsSummary({ issue, initialPermission }: Props): JSX.Element {
   const isAdminOrManager = hasAdminOrManagerRole(authUser?.role);
 
   const evaluatePermission = () => {
-    let permissions: IssuePermission[] = [];
+    const permissions: IssuePermission[] = [];
     if (
       initialPermission?.issuePermission === IssuePermission.CanDelete ||
       isAdminOrManager
@@ -87,7 +87,7 @@ function IssueDetailsSummary({ issue, initialPermission }: Props): JSX.Element {
     setUpdating(true);
     await handleSubmit(async (data) => {
       try {
-        let issue = await adapter.Issue.update({
+        const issue = await adapter.Issue.update({
           id: data.id,
           summary: data.summary,
           description: data.description,
@@ -106,7 +106,7 @@ function IssueDetailsSummary({ issue, initialPermission }: Props): JSX.Element {
   };
 
   const handlePermissionUpdate = async (isPinnedToKanban: boolean) => {
-    await handleSubmit(async (data) => {
+    await handleSubmit(async () => {
       try {
         if (!initialPermission && isAdminOrManager) {
           await adapter.Permission.create({

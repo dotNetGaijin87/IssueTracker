@@ -6,10 +6,11 @@ import {
   TextareaAutosize,
   Typography
 } from '@mui/material';
-import { useAuth } from '../../authentication/Auth';
-import { adapter } from '../../adapters/adapter';
+import { useAuth } from '@/authentication/Auth';
+import { adapter } from '@/adapters/adapter';
+import displayError from '@/helpers/errorHandling/displayError';
 import { useParams } from 'react-router-dom';
-import CommentButton from '../commentButton/CommentButton';
+import CommentButton from '@/components/commentButton/CommentButton';
 
 interface Props {
   onCommentAdded?: () => void;
@@ -30,7 +31,9 @@ function AddComment({ onCommentAdded }: Props) {
         content: content
       });
       if (onCommentAdded) onCommentAdded();
-    } catch (ex) {}
+    } catch (ex) {
+      displayError(ex, 'Adding comment failed');
+    }
     setLoading(false);
   };
 

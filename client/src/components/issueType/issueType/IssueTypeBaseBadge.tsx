@@ -1,5 +1,5 @@
 import { Box, Typography } from '@mui/material';
-import { IssueType } from '../../../models/issue/issueType';
+import { IssueType } from '@/models/issue/issueType';
 
 interface Props {
   value: IssueType;

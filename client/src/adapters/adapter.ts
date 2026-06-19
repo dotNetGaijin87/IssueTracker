@@ -1,8 +1,8 @@
 import axios, { AxiosError, AxiosResponse } from 'axios';
-import { baseUrl } from '../AppSettings';
-import { getAccessToken } from '../authentication/Auth';
-import createQueryString from '../helpers/createQueryString';
-import getFieldMask from '../helpers/getFieldMask';
+import { baseUrl } from '@/AppSettings';
+import { getAccessToken } from '@/authentication/Auth';
+import createQueryString from '@/helpers/createQueryString';
+import getFieldMask from '@/helpers/getFieldMask';
 
 axios.defaults.baseURL = baseUrl;
 const getRespBody = (response: AxiosResponse) => response.data;

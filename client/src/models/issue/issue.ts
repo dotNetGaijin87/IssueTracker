@@ -1,7 +1,7 @@
 import { IssueType } from './issueType';
 import { IssuePriority } from './issuePriority';
 import { IssueProgress } from './issueProgress';
-import { IssueComment } from '../comment/issueComment';
+import { IssueComment } from '@/models/comment/issueComment';
 
 export type Issue = {
   id: string;

@@ -2,10 +2,10 @@ import { MenuItem, TextField } from '@mui/material';
 
 interface Props<T> {
   elements: T;
-  initialItem: {};
+  initialItem: unknown;
 }
 
-function Select<T extends Object>({ elements, initialItem }: Props<T>) {
+function Select<T extends object>({ elements, initialItem }: Props<T>) {
   return (
     <TextField
       size="small"

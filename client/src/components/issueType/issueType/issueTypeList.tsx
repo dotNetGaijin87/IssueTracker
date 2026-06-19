@@ -1,8 +1,8 @@
 import { Box, Typography } from '@mui/material';
-import { IssueType } from '../../../models/issue/issueType';
+import { IssueType } from '@/models/issue/issueType';
 import ShowChartIcon from '@mui/icons-material/ShowChart';
 import PestControlIcon from '@mui/icons-material/PestControl';
-import BaseBadge from '../../baseBadge/BaseBadge';
+import BaseBadge from '@/components/baseBadge/BaseBadge';
 
 const issueTypeList = (unstyled: boolean | undefined) => [
   {

@@ -1,4 +1,4 @@
-import { IssuePermission } from '../issue/issuePermission';
+import { IssuePermission } from '@/models/issue/issuePermission';
 
 export type Permission = {
   userId: string;

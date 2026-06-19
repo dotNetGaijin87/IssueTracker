@@ -1,5 +1,5 @@
 import { Box, Typography } from '@mui/material';
-import { IssuePermission } from '../../models/issue/issuePermission';
+import { IssuePermission } from '@/models/issue/issuePermission';
 import EditIcon from '@mui/icons-material/Edit';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 

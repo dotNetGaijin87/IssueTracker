@@ -1,15 +1,15 @@
 import { Box, Grid } from '@mui/material';
 import Board from '@asseinfo/react-kanban';
-import KanbanColumn from '../kanbanCard/KanbanCard';
-import issueProgressList from '../issueProgress/issueProgress/issueProgressList';
-import IssuePriorityBadge from '../issuePriority/IssuePriorityBadge';
+import KanbanColumn from '@/components/kanbanCard/KanbanCard';
+import issueProgressList from '@/components/issueProgress/issueProgress/issueProgressList';
+import IssuePriorityBadge from '@/components/issuePriority/IssuePriorityBadge';
 import FeaturedPlayListIcon from '@mui/icons-material/FeaturedPlayList';
-import IssueTypeIcon from '../issueType/IssueTypeIcon';
-import TooltipNavButtonBase from '../toolTipNavButton/TooltipNavButtonBase';
+import IssueTypeIcon from '@/components/issueType/IssueTypeIcon';
+import TooltipNavButtonBase from '@/components/toolTipNavButton/TooltipNavButtonBase';
 import { Typography } from '@mui/material';
-import { IssueProgress } from '../../models/issue/issueProgress';
-import { adapter } from '../../adapters/adapter';
-import displayError from '../../helpers/errorHandling/displayError';
+import { IssueProgress } from '@/models/issue/issueProgress';
+import { adapter } from '@/adapters/adapter';
+import displayError from '@/helpers/errorHandling/displayError';
 
 const Kanban = ({ cards }) => {
   let board = { columns: [] };

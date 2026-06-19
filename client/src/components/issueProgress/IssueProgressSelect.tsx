@@ -1,7 +1,7 @@
 import { FormControl, InputLabel, MenuItem, Select } from '@mui/material';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import issueProgressList from './issueProgress/issueProgressList';
-import { IssueProgress } from '../../models/issue/issueProgress';
+import { IssueProgress } from '@/models/issue/issueProgress';
 import { useState } from 'react';
 
 interface Props {
@@ -26,7 +26,7 @@ function IssueProgressSelect({
   const [value, setValue] = useState(defaultValue);
 
   const update = (e: any) => {
-    let value = e.target.value;
+    const value = e.target.value;
     setValue(e.target.value);
     if (onChange) {
       if (value === IssueProgress.Unspecified) {

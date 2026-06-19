@@ -1,7 +1,7 @@
 import { FormControl, InputLabel, MenuItem, Select } from '@mui/material';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import issuePriorityList from './issuePriority/issuePriorityList';
-import { IssuePriority } from '../../models/issue/issuePriority';
+import { IssuePriority } from '@/models/issue/issuePriority';
 import { useState } from 'react';
 
 interface Props {
@@ -31,7 +31,7 @@ function IssuePrioritySelect({
   );
 
   const update = (e: any) => {
-    let newValue = e.target.value;
+    const newValue = e.target.value;
     setValue(newValue);
     if (onChange) {
       if (value === IssuePriority.Unspecified) {

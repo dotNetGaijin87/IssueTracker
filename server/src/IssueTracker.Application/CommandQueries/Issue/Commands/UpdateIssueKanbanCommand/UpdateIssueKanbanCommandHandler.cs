@@ -25,7 +25,7 @@ public class UpdateIssueKanbanCommandHandler : IRequestHandler<UpdateIssueKanban
         {
             var issues = await _appDbContext.Issues
                 .Where(x => cmd.Permissions.Select(x => x.IssueId).Contains(x.Id))
-                .Include(x =>  x.Permissions.Where(x => x.UserId == cmd.UserCredentials.Name))
+                .Include(x =>  x.Permissions.Where(x => x.UserId == cmd.UserCredentials.Id))
                 .ToListAsync();
 
             foreach (Issue issue in issues)
@@ -51,7 +51,7 @@ public class UpdateIssueKanbanCommandHandler : IRequestHandler<UpdateIssueKanban
         }
         catch (Exception ex)
         {
-            throw new UpdateIssueKanbanCommandException($"Updating kanban for user \"{cmd.UserCredentials.Name}\" error.", ex);
+            throw new UpdateIssueKanbanCommandException($"Updating kanban for user \"{cmd.UserCredentials.Id}\" error.", ex);
         }
     }
 }

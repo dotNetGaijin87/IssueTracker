@@ -9,30 +9,30 @@ import {
 } from '@mui/material';
 import { useParams } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
-import LoadingPage from '../../../layout/common/LoadingPage';
-import { adapter } from '../../../adapters/adapter';
-import { Project, ProjectDefaultValue } from '../../../models/project/project';
+import LoadingPage from '@/layout/common/LoadingPage';
+import { adapter } from '@/adapters/adapter';
+import { Project, ProjectDefaultValue } from '@/models/project/project';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SaveIcon from '@mui/icons-material/Save';
 import EditIcon from '@mui/icons-material/Edit';
 import CancelIcon from '@mui/icons-material/Cancel';
 import BugReportIcon from '@mui/icons-material/BugReport';
 import { toast } from 'react-toastify';
-import displayError from '../../../helpers/errorHandling/displayError';
-import { UserRole } from '../../../models/user/userRole';
+import displayError from '@/helpers/errorHandling/displayError';
+import { UserRole } from '@/models/user/userRole';
 import { Controller, useForm } from 'react-hook-form';
-import { useAuth } from '../../../authentication/Auth';
-import FormFieldWrapper from '../../../components/formFieldWrapper/FormFieldWrapper';
-import safelyConvertDateTime from '../../../helpers/time/safelyConvertDateTime';
-import MarkupEditor from '../../../components/markupEditor/MarkupEditor';
-import Panel from '../../../components/panel/Panel';
-import ProjectProgressSelect from '../../../components/projectProgress/ProjectProgressSelect';
-import TooltipActionButton from '../../../components/tooltipActionButton/TooltipActionButton';
-import ButtonIconWithConfirmationDialog from '../../../components/buttonIconWithConfirmationDialog/ButtonIconWithConfirmationDialog';
-import { ProjectProgress } from '../../../models/project/projectProgress';
-import ProjectProgressBadge from '../../../components/projectProgress/ProjectProgressBadge';
-import VerticalDivider from '../../../components/verticalDivider/VerticalDivider';
-import parseDateTimeToMessage from '../../../helpers/time/parseDateTimeToMessage';
+import { useAuth } from '@/authentication/Auth';
+import FormFieldWrapper from '@/components/formFieldWrapper/FormFieldWrapper';
+import safelyConvertDateTime from '@/helpers/time/safelyConvertDateTime';
+import MarkupEditor from '@/components/markupEditor/MarkupEditor';
+import Panel from '@/components/panel/Panel';
+import ProjectProgressSelect from '@/components/projectProgress/ProjectProgressSelect';
+import TooltipActionButton from '@/components/tooltipActionButton/TooltipActionButton';
+import ButtonIconWithConfirmationDialog from '@/components/buttonIconWithConfirmationDialog/ButtonIconWithConfirmationDialog';
+import { ProjectProgress } from '@/models/project/projectProgress';
+import ProjectProgressBadge from '@/components/projectProgress/ProjectProgressBadge';
+import VerticalDivider from '@/components/verticalDivider/VerticalDivider';
+import parseDateTimeToMessage from '@/helpers/time/parseDateTimeToMessage';
 
 function ProjectDetailsPage(): JSX.Element {
   const navigate = useNavigate();
@@ -71,13 +71,13 @@ function ProjectDetailsPage(): JSX.Element {
     };
 
     run();
-  }, [projectId]);
+  }, [projectId, reset]);
 
   const handleProjectUpdate = async () => {
     setUpdating(true);
     await handleSubmit(async (data) => {
       try {
-        let project = await adapter.Project.update({
+        const project = await adapter.Project.update({
           id: data.id,
           summary: data.summary,
           progress: data.progress,

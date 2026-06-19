@@ -1,5 +1,5 @@
 import LoadingPage from './LoadingPage';
-import { useAuth } from '../../authentication/Auth';
+import { useAuth } from '@/authentication/Auth';
 
 interface Props {
   children: JSX.Element;

@@ -1,4 +1,4 @@
-function createQueryString(resource: Object | undefined): string {
+function createQueryString(resource: object | undefined): string {
   if (resource === undefined) return '';
   let queryString: string = '?';
 

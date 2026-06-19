@@ -9,13 +9,6 @@
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
 
-  <!--
-    GHSA-rvv3-g6hj-g44x (CVE-2026-32933): DoS via uncontrolled recursion when AutoMapper maps
-    deeply self-referential object graphs. The fix ships only in AutoMapper >= 15.1.1 / 16.1.1,
-    which require a commercial license. This application maps trusted, shallow EF Core entities
-    (not attacker-controlled object graphs), so the vulnerability is not reachable here.
-    Suppressing the audit warning rather than taking the commercial dependency.
-  -->
   <ItemGroup>
     <NuGetAuditSuppress Include="https://github.com/advisories/GHSA-rvv3-g6hj-g44x" />
   </ItemGroup>

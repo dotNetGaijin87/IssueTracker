@@ -25,8 +25,8 @@ public class GetIssueKanbanQueryHandler : IRequestHandler<GetIssueKanbanQuery, I
         {
             var issues = await _appDbContext.Issues
                 .Where(x => x.Permissions
-                                .Any(x => x.UserId == query.UserCredentials.Name && x.IsPinnedToKanban == true))
-                .Include(x => x.Permissions.Where(x => x.UserId == query.UserCredentials.Name))
+                                .Any(x => x.UserId == query.UserCredentials.Id && x.IsPinnedToKanban == true))
+                .Include(x => x.Permissions.Where(x => x.UserId == query.UserCredentials.Id))
                 .Include(x => x.Project)
                 .ToListAsync();
 
@@ -36,7 +36,7 @@ public class GetIssueKanbanQueryHandler : IRequestHandler<GetIssueKanbanQuery, I
         }
         catch (Exception ex)
         {
-            throw new GetIssueKanbanQueryException($"Getting kanban for user  \"{query.UserCredentials.Name}\" error.", ex);
+            throw new GetIssueKanbanQueryException($"Getting kanban for user  \"{query.UserCredentials.Id}\" error.", ex);
         }
     }
 }

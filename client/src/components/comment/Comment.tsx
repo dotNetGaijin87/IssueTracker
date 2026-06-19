@@ -6,12 +6,13 @@ import {
   TextareaAutosize,
   Typography
 } from '@mui/material';
-import { IssueComment } from '../../models/comment/issueComment';
-import parseDateTimeToMessage from '../../helpers/time/parseDateTimeToMessage';
-import { adapter } from '../../adapters/adapter';
-import { useAuth } from '../../authentication/Auth';
-import CommentButton from '../commentButton/CommentButton';
-import { UserRole } from '../../models/user/userRole';
+import { IssueComment } from '@/models/comment/issueComment';
+import parseDateTimeToMessage from '@/helpers/time/parseDateTimeToMessage';
+import { adapter } from '@/adapters/adapter';
+import displayError from '@/helpers/errorHandling/displayError';
+import { useAuth } from '@/authentication/Auth';
+import CommentButton from '@/components/commentButton/CommentButton';
+import { UserRole } from '@/models/user/userRole';
 
 interface Props {
   comment: IssueComment;
@@ -35,7 +36,9 @@ function Comment({ comment, onCommentStateChanged }: Props) {
         content: content
       });
       if (onCommentStateChanged) onCommentStateChanged();
-    } catch (ex) {}
+    } catch (ex) {
+      displayError(ex, 'Updating comment failed');
+    }
     setSaving(false);
   };
 
@@ -44,7 +47,9 @@ function Comment({ comment, onCommentStateChanged }: Props) {
       setDeleting(true);
       await adapter.Comment.delete(comment.id);
       if (onCommentStateChanged) onCommentStateChanged();
-    } catch (ex) {}
+    } catch (ex) {
+      displayError(ex, 'Deleting comment failed');
+    }
     setDeleting(false);
   };
 

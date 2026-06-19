@@ -1,4 +1,4 @@
-import { UserRole } from '../../models/user/userRole';
+import { UserRole } from '@/models/user/userRole';
 
 function hasAdminOrManagerRole(userRole: UserRole | undefined): boolean {
   if (userRole)

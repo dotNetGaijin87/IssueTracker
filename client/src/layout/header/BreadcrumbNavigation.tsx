@@ -4,7 +4,7 @@ import Breadcrumbs from '@mui/material/Breadcrumbs';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import { Link as RouterLink, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { pathToNameMap } from '../../consts/pathToNameMap';
+import { pathToNameMap } from '@/consts/pathToNameMap';
 
 interface LinkRouterProps extends LinkProps {
   to: string;

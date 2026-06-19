@@ -1,4 +1,4 @@
-import { IssuePriority } from '../../models/issue/issuePriority';
+import { IssuePriority } from '@/models/issue/issuePriority';
 import issuePriorityList from './issuePriority/issuePriorityList';
 
 interface Props {

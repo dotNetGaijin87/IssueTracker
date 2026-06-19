@@ -3,41 +3,47 @@ export const tableContainerStyle = {
     bgcolor: 'background.paper',
     boxShadow: 'none',
     backgroundImage: 'none',
-    borderRadius: 2,
+    borderRadius: '12px',
     maxHeight: 600,
-    mt: 1,
+    mt: 2,
     minWidth: 200,
+    border: '1px solid',
     borderColor: 'divider',
-    borderWidth: '1px',
-    borderStyle: 'solid',
+    overflow: 'auto',
     '.MuiTable-root': {
       overflowX: 'initial'
     },
     '.MuiTableCell-root': {
-      padding: 0.5
+      padding: '12px 16px',
+      textAlign: 'left'
     },
     table: {
       whiteSpace: 'nowrap',
       '& thead th': {
-        borderBottomColor: 'divider',
-        borderWidth: '1px',
-        borderStyle: 'solid',
-
+        position: 'sticky',
+        top: 0,
         zIndex: 600,
-        fallbacks: {
-          position: '-webkit-sticky'
-        }
+        backgroundColor: 'background.paper',
+        color: 'text.secondary',
+        fontSize: '0.72rem',
+        fontWeight: 700,
+        textTransform: 'uppercase',
+        letterSpacing: '0.06em',
+        borderBottom: '1px solid',
+        borderColor: 'divider'
       },
-      '.MuiTableRow-root td': {
-        borderBottomColor: 'divider',
-        borderWidth: '1px',
-        borderStyle: 'solid'
+      '& tbody .MuiTableRow-root': {
+        transition: 'background-color .14s ease'
       },
-
-      '.MuiTableRow-root': {
-        margin: 0,
-
-        overflow: 'hidden'
+      '& tbody .MuiTableRow-root:hover': {
+        backgroundColor: 'action.hover'
+      },
+      '& tbody .MuiTableRow-root td': {
+        borderBottom: '1px solid',
+        borderColor: 'divider'
+      },
+      '& tbody .MuiTableRow-root:last-of-type td': {
+        borderBottom: 'none'
       }
     }
   }

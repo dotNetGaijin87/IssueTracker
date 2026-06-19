@@ -1,8 +1,8 @@
 import { Box, Grow, TextField } from '@mui/material';
 import React, { useEffect } from 'react';
-import Field from '../../components/field/Field';
-import Bar from '../../components/bar/Bar';
-import delayExec from '../../helpers/delayExec';
+import Field from '@/components/field/Field';
+import Bar from '@/components/bar/Bar';
+import delayExec from '@/helpers/delayExec';
 
 interface Props {
   onSearchClicked: (value: object) => void;
@@ -19,6 +19,7 @@ function ActionBar({ onSearchClicked }: Props) {
       return;
     }
     return delayExec(() => onSearchClicked({ id: id, email: email }), 1500);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, email]);
 
   return (

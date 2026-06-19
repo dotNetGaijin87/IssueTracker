@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { FormControl, InputLabel, MenuItem, Select } from '@mui/material';
 import issueTypeList from './issueType/issueTypeList';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import { IssueType } from '../../models/issue/issueType';
+import { IssueType } from '@/models/issue/issueType';
 
 interface Props {
   args?: any;
@@ -26,7 +26,7 @@ function IssueTypeSelect({
   const [value, setValue] = useState(defaultValue);
 
   const update = (e: any) => {
-    let value = e.target.value;
+    const value = e.target.value;
     setValue(value);
     if (onChange) {
       if (value === IssueType.Unspecified) {

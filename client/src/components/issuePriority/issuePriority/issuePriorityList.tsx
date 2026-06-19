@@ -1,10 +1,10 @@
 import { Box, Typography } from '@mui/material';
-import { IssuePriority } from '../../../models/issue/issuePriority';
+import { IssuePriority } from '@/models/issue/issuePriority';
 import LooksOneIcon from '@mui/icons-material/LooksOne';
 import LooksTwoIcon from '@mui/icons-material/LooksTwo';
 import Looks3Icon from '@mui/icons-material/Looks3';
 import Looks4Icon from '@mui/icons-material/Looks4';
-import BaseBadge from '../../baseBadge/BaseBadge';
+import BaseBadge from '@/components/baseBadge/BaseBadge';
 
 const issuePriorityList = (
   unstyled: boolean | undefined,

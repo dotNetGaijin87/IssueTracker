@@ -1,4 +1,4 @@
-import { IssuePermission } from '../../models/issue/issuePermission';
+import { IssuePermission } from '@/models/issue/issuePermission';
 import permissionBadgeList from './permissionBadgeList';
 
 interface Props {

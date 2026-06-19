@@ -1,13 +1,13 @@
 import { TableCell, TableRow, ToggleButton } from '@mui/material';
-import { useAuth } from '../../authentication/Auth';
-import safelyConvertDateTime from '../../helpers/time/safelyConvertDateTime';
-import { User } from '../../models/user/user';
-import { UserRole } from '../../models/user/userRole';
+import { useAuth } from '@/authentication/Auth';
+import safelyConvertDateTime from '@/helpers/time/safelyConvertDateTime';
+import { User } from '@/models/user/user';
+import { UserRole } from '@/models/user/userRole';
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
 import React from 'react';
-import { adapter } from '../../adapters/adapter';
-import displayError from '../../helpers/errorHandling/displayError';
+import { adapter } from '@/adapters/adapter';
+import displayError from '@/helpers/errorHandling/displayError';
 import { toast } from 'react-toastify';
 
 interface Props {

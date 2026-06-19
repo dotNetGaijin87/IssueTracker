@@ -1,6 +1,6 @@
 import { Box, Typography } from '@mui/material';
-import { IssueProgress } from '../../../models/issue/issueProgress';
-import BaseBadge from '../../baseBadge/BaseBadge';
+import { IssueProgress } from '@/models/issue/issueProgress';
+import BaseBadge from '@/components/baseBadge/BaseBadge';
 
 const issueProgressList = (unstyled: boolean | undefined) => [
   {

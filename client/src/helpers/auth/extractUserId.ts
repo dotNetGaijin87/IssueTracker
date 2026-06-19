@@ -2,7 +2,7 @@ function extractUserId(user: string | undefined): string {
   if (user === undefined) {
     new Error('No UserId');
   }
-  let userId = user?.split('|').pop();
+  const userId = user?.split('|').pop();
 
   if (userId === undefined) {
     new Error('No UserId');

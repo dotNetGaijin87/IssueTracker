@@ -1,11 +1,11 @@
 import { AppBar, Box, Drawer, Toolbar, Typography } from '@mui/material';
-import TooltipNavButtonBase from '../../components/toolTipNavButton/TooltipNavButtonBase';
+import TooltipNavButtonBase from '@/components/toolTipNavButton/TooltipNavButtonBase';
 import ViewKanbanIcon from '@mui/icons-material/ViewKanban';
 import GroupIcon from '@mui/icons-material/Group';
 import SettingsIcon from '@mui/icons-material/Settings';
 import LoginIcon from '@mui/icons-material/Login';
 import LogoutIcon from '@mui/icons-material/Logout';
-import { useAuth } from '../../authentication/Auth';
+import { useAuth } from '@/authentication/Auth';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import BreadcrumbNavigation from './BreadcrumbNavigation';
@@ -18,8 +18,11 @@ function Header() {
   return (
     <>
       <AppBar
+        elevation={0}
         sx={{
           bgcolor: 'background.default',
+          borderBottom: '1px solid',
+          borderColor: 'divider',
           display: 'flex',
           alignItems: 'center',
           flexDirection: 'row',
@@ -41,10 +44,29 @@ function Header() {
             flexDirection: 'row'
           }}
         >
-          <AccountCircleIcon color="primary" />
-          <Typography sx={{ m: 1, color: 'primary.main', height: '25px' }}>
-            {authUser?.name}
-          </Typography>
+          {authUser?.name && (
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 0.75,
+                mr: 2,
+                px: 1.25,
+                py: 0.5,
+                borderRadius: 2,
+                border: '1px solid',
+                borderColor: 'divider',
+                bgcolor: 'background.paper'
+              }}
+            >
+              <AccountCircleIcon sx={{ color: 'primary.main', fontSize: 20 }} />
+              <Typography
+                sx={{ color: 'text.primary', fontSize: '0.85rem', fontWeight: 500 }}
+              >
+                {authUser?.name}
+              </Typography>
+            </Box>
+          )}
         </Box>
       </AppBar>
       <Drawer
@@ -55,7 +77,9 @@ function Header() {
           flexShrink: 0,
           '& .MuiDrawer-paper': {
             width: drawerWidth,
-            boxSizing: 'border-box'
+            boxSizing: 'border-box',
+            borderRight: '1px solid',
+            borderColor: 'divider'
           }
         }}
       >

@@ -11,23 +11,23 @@ import {
   TextField
 } from '@mui/material';
 import AddBoxIcon from '@mui/icons-material/AddBox';
-import TooltipActionButton from '../../../components/tooltipActionButton/TooltipActionButton';
-import FormFieldWrapper from '../../../components/formFieldWrapper/FormFieldWrapper';
-import DialogHeader from '../../../components/dialogHeader/DialogHeader';
-import HorizontalDivider from '../../../components/horizontalDivider/HorizontalDivider';
-import MarkupEditor from '../../../components/markupEditor/MarkupEditor';
-import displayError from '../../../helpers/errorHandling/displayError';
-import Button from '../../../components/button/Button';
-import LoadingButton from '../../../components/loadingButton/LoadingButton';
-import IssueTypeSelect from '../../../components/issueType/IssueTypeSelect';
-import IssueProgressSelect from '../../../components/issueProgress/IssueProgressSelect';
-import IssuePrioritySelect from '../../../components/issuePriority/IssuePrioritySelect';
-import AssigneesSetter from '../../../components/assigneesSetter/AssigneesSetter';
-import { adapter } from '../../../adapters/adapter';
-import { Issue } from '../../../models/issue/issue';
-import { IssueType } from '../../../models/issue/issueType';
-import { IssueProgress } from '../../../models/issue/issueProgress';
-import { IssuePriority } from '../../../models/issue/issuePriority';
+import TooltipActionButton from '@/components/tooltipActionButton/TooltipActionButton';
+import FormFieldWrapper from '@/components/formFieldWrapper/FormFieldWrapper';
+import DialogHeader from '@/components/dialogHeader/DialogHeader';
+import HorizontalDivider from '@/components/horizontalDivider/HorizontalDivider';
+import MarkupEditor from '@/components/markupEditor/MarkupEditor';
+import displayError from '@/helpers/errorHandling/displayError';
+import Button from '@/components/button/Button';
+import LoadingButton from '@/components/loadingButton/LoadingButton';
+import IssueTypeSelect from '@/components/issueType/IssueTypeSelect';
+import IssueProgressSelect from '@/components/issueProgress/IssueProgressSelect';
+import IssuePrioritySelect from '@/components/issuePriority/IssuePrioritySelect';
+import AssigneesSetter from '@/components/assigneesSetter/AssigneesSetter';
+import { adapter } from '@/adapters/adapter';
+import { Issue } from '@/models/issue/issue';
+import { IssueType } from '@/models/issue/issueType';
+import { IssueProgress } from '@/models/issue/issueProgress';
+import { IssuePriority } from '@/models/issue/issuePriority';
 
 function AddNewIssue(): JSX.Element {
   const { projectId } = useParams<{ projectId: string }>();

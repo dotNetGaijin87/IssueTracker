@@ -9,25 +9,33 @@ function Bar({ title, children }: Props) {
   return (
     <Box
       display="flex"
+      alignItems="center"
       sx={{
         bgcolor: 'background.paper',
-        borderRadius: 1,
+        borderRadius: 2,
+        border: '1px solid',
         borderColor: 'divider',
-        borderWidth: '1px',
-        borderStyle: 'solid'
+        px: 1.5
       }}
     >
-      <Box component="span" sx={{ m: 1 }}>
-        <Typography>{title}</Typography>
-      </Box>
+      <Typography
+        sx={{
+          mr: 1,
+          color: 'text.secondary',
+          fontSize: '0.72rem',
+          fontWeight: 700,
+          textTransform: 'uppercase',
+          letterSpacing: '0.06em',
+          whiteSpace: 'nowrap'
+        }}
+      >
+        {title}
+      </Typography>
       <Box
         sx={{
-          ml: 1,
-          mr: 1,
           display: 'flex',
-          justifyContent: 'space-between',
-          bgcolor: 'background.paper',
-          borderRadius: 1
+          alignItems: 'center',
+          flexWrap: 'wrap'
         }}
       >
         {children}

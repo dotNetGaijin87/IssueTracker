@@ -8,17 +8,18 @@ import {
   TableHead,
   TableRow
 } from '@mui/material';
-import { adapter } from '../../../adapters/adapter';
-import LoadingPage from '../../../layout/common/LoadingPage';
-import { Issue } from '../../../models/issue/issue';
-import TableContainer from '../../../components/tableContainer/TableContainer';
+import { adapter } from '@/adapters/adapter';
+import displayError from '@/helpers/errorHandling/displayError';
+import LoadingPage from '@/layout/common/LoadingPage';
+import { Issue } from '@/models/issue/issue';
+import TableContainer from '@/components/tableContainer/TableContainer';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import { Link, useParams } from 'react-router-dom';
-import safelyConvertDateTime from '../../../helpers/time/safelyConvertDateTime';
-import Pagination from '../../../components/pagination/Pagination';
-import IssueTypeBadge from '../../../components/issueType/IssueTypeBadge';
-import IssueProgressBadge from '../../../components/issueProgress/IssueProgressBadge';
-import IssuePriorityBadge from '../../../components/issuePriority/IssuePriorityBadge';
+import safelyConvertDateTime from '@/helpers/time/safelyConvertDateTime';
+import Pagination from '@/components/pagination/Pagination';
+import IssueTypeBadge from '@/components/issueType/IssueTypeBadge';
+import IssueProgressBadge from '@/components/issueProgress/IssueProgressBadge';
+import IssuePriorityBadge from '@/components/issuePriority/IssuePriorityBadge';
 import ActionBar, { IssueListSearchCriteria } from './ActionBar';
 
 interface IssueList {
@@ -41,17 +42,19 @@ function IssuesListPage() {
     const run = async () => {
       try {
         setLoading(true);
-        let rsp = await adapter.Issue.list({
+        const rsp = await adapter.Issue.list({
           ...searchCriteria,
           projectId: projectId
         });
         setState(rsp);
-      } catch (ex) {}
+      } catch (ex) {
+        displayError(ex, 'Loading issues failed');
+      }
       setLoading(false);
     };
 
     run();
-  }, [searchCriteria]);
+  }, [searchCriteria, projectId]);
 
   const handlePaginationChange = (
     event: React.ChangeEvent<unknown>,
@@ -100,10 +103,10 @@ function IssuesListPage() {
                       </TableCell>
                       <TableCell>{issue.id}</TableCell>
                       <TableCell>
-                        <IssueTypeBadge value={issue.type} unstyled={true} />
+                        <IssuePriorityBadge value={issue.priority} />
                       </TableCell>
                       <TableCell>
-                        <IssuePriorityBadge value={issue.priority} />
+                        <IssueTypeBadge value={issue.type} unstyled={true} />
                       </TableCell>
                       <TableCell>
                         <IssueProgressBadge value={issue.progress} />

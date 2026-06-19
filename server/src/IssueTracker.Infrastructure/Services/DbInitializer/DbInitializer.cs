@@ -72,9 +72,110 @@ namespace IssueTracker.Infrastructure.Services.DbInitializer
                     new User { Id = "employee", Email = "www.employee@email.com", Role = UserRole.employee , RegisteredOn = DateTime.Now, LastLoggedOn = DateTime.Now, IsActivated = false },
                     new User { Id = "admin", Email = "www.admin@email.com", Role = UserRole.admin , RegisteredOn = DateTime.Now, LastLoggedOn = DateTime.Now, IsActivated = true },
                     new User { Id = "LordWader", Email = "www.LordWader@email.com", Role = UserRole.manager , RegisteredOn = DateTime.Now, LastLoggedOn = DateTime.Now, IsActivated = false },
+                    // Id is the Auth0 'sub' suffix of the www.admin@gmail.com demo account,
+                    // matching UserCredentials.Id so the seeded Kanban shows on login.
+                    new User { Id = "62b8fbceea0234ae97feed0d", Email = "www.admin@gmail.com", Role = UserRole.admin , RegisteredOn = DateTime.Now, LastLoggedOn = DateTime.Now, IsActivated = true },
                 });
             context.Projects.AddRange(new List<Project>
                 {
+                    new Project
+                    {
+                        Id = "Project_Demo",
+                        Summary  = "Demo Board",
+                        Description = "Sample issues pinned to the demo account's Kanban board.",
+                        CreationTime = DateTime.Now,
+                        Progress = ProjectProgress.Open,
+                        CreatedBy = "www.admin@gmail.com",
+                        Issues = new List<Issue>
+                        {
+                            new Issue
+                            {
+                                Id = "Demo_1",
+                                Type = IssueType.Bug,
+                                Summary = "Login redirect loops on Safari",
+                                Description = "Users on Safari bounce between the app and Auth0 after sign-in.",
+                                CreationTime = DateTime.Now,
+                                Progress = IssueProgress.ToDo,
+                                Priority = IssuePriority.High,
+                                CreatedBy = "www.admin@gmail.com",
+                                Permissions = new List<Permission>
+                                {
+                                    new Permission { IssuePermission = IssuePermission.CanModify, UserId = "62b8fbceea0234ae97feed0d", IsPinnedToKanban = true, KanbanRowPosition = 0 },
+                                }
+                            },
+                            new Issue
+                            {
+                                Id = "Demo_2",
+                                Type = IssueType.Improvement,
+                                Summary = "Add dark-mode toggle to settings",
+                                CreationTime = DateTime.Now,
+                                Progress = IssueProgress.InProgress,
+                                Priority = IssuePriority.Medium,
+                                CreatedBy = "www.admin@gmail.com",
+                                Permissions = new List<Permission>
+                                {
+                                    new Permission { IssuePermission = IssuePermission.CanModify, UserId = "62b8fbceea0234ae97feed0d", IsPinnedToKanban = true, KanbanRowPosition = 0 },
+                                }
+                            },
+                            new Issue
+                            {
+                                Id = "Demo_3",
+                                Type = IssueType.Improvement,
+                                Summary = "Write integration tests for permissions",
+                                CreationTime = DateTime.Now,
+                                Progress = IssueProgress.InProgress,
+                                Priority = IssuePriority.High,
+                                CreatedBy = "www.admin@gmail.com",
+                                Permissions = new List<Permission>
+                                {
+                                    new Permission { IssuePermission = IssuePermission.CanModify, UserId = "62b8fbceea0234ae97feed0d", IsPinnedToKanban = true, KanbanRowPosition = 1 },
+                                }
+                            },
+                            new Issue
+                            {
+                                Id = "Demo_4",
+                                Type = IssueType.Bug,
+                                Summary = "Kanban cards lose position on refresh",
+                                CreationTime = DateTime.Now,
+                                Progress = IssueProgress.ToBeTested,
+                                Priority = IssuePriority.Critical,
+                                CreatedBy = "www.admin@gmail.com",
+                                Permissions = new List<Permission>
+                                {
+                                    new Permission { IssuePermission = IssuePermission.CanModify, UserId = "62b8fbceea0234ae97feed0d", IsPinnedToKanban = true, KanbanRowPosition = 0 },
+                                }
+                            },
+                            new Issue
+                            {
+                                Id = "Demo_5",
+                                Type = IssueType.Improvement,
+                                Summary = "Paginate the issues table",
+                                CreationTime = DateTime.Now,
+                                Progress = IssueProgress.OnHold,
+                                Priority = IssuePriority.Low,
+                                CreatedBy = "www.admin@gmail.com",
+                                Permissions = new List<Permission>
+                                {
+                                    new Permission { IssuePermission = IssuePermission.CanModify, UserId = "62b8fbceea0234ae97feed0d", IsPinnedToKanban = true, KanbanRowPosition = 0 },
+                                }
+                            },
+                            new Issue
+                            {
+                                Id = "Demo_6",
+                                Type = IssueType.Bug,
+                                Summary = "Upgrade backend to .NET 8",
+                                CreationTime = DateTime.Now.AddDays(-10),
+                                CompletionTime = DateTime.Now,
+                                Progress = IssueProgress.Closed,
+                                Priority = IssuePriority.Medium,
+                                CreatedBy = "www.admin@gmail.com",
+                                Permissions = new List<Permission>
+                                {
+                                    new Permission { IssuePermission = IssuePermission.CanModify, UserId = "62b8fbceea0234ae97feed0d", IsPinnedToKanban = true, KanbanRowPosition = 0 },
+                                }
+                            },
+                        },
+                    },
                     new Project
                     {
                         Id = "Project_1",

@@ -9,12 +9,11 @@ function Panel({ children }: Props) {
     <Grid
       sx={{
         bgcolor: 'background.paper',
-        borderRadius: 2,
-        padding: 1,
+        borderRadius: '14px',
+        padding: 2,
         height: 'inherit',
+        border: '1px solid',
         borderColor: 'divider',
-        borderWidth: '1px',
-        borderStyle: 'solid',
         overflowY: 'hidden'
       }}
     >

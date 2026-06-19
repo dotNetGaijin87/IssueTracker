@@ -10,19 +10,19 @@ import {
 } from '@mui/material';
 import AddBoxIcon from '@mui/icons-material/AddBox';
 import { toast } from 'react-toastify';
-import { useAuth } from '../../../authentication/Auth';
-import { adapter } from '../../../adapters/adapter';
-import { Project } from '../../../models/project/project';
-import { ProjectProgress } from '../../../models/project/projectProgress';
-import TooltipActionButton from '../../../components/tooltipActionButton/TooltipActionButton';
-import ProjectProgressSelect from '../../../components/projectProgress/ProjectProgressSelect';
-import FormFieldWrapper from '../../../components/formFieldWrapper/FormFieldWrapper';
-import DialogHeader from '../../../components/dialogHeader/DialogHeader';
-import HorizontalDivider from '../../../components/horizontalDivider/HorizontalDivider';
-import MarkupEditor from '../../../components/markupEditor/MarkupEditor';
-import displayError from '../../../helpers/errorHandling/displayError';
-import Button from '../../../components/button/Button';
-import LoadingButton from '../../../components/loadingButton/LoadingButton';
+import { useAuth } from '@/authentication/Auth';
+import { adapter } from '@/adapters/adapter';
+import { Project } from '@/models/project/project';
+import { ProjectProgress } from '@/models/project/projectProgress';
+import TooltipActionButton from '@/components/tooltipActionButton/TooltipActionButton';
+import ProjectProgressSelect from '@/components/projectProgress/ProjectProgressSelect';
+import FormFieldWrapper from '@/components/formFieldWrapper/FormFieldWrapper';
+import DialogHeader from '@/components/dialogHeader/DialogHeader';
+import HorizontalDivider from '@/components/horizontalDivider/HorizontalDivider';
+import MarkupEditor from '@/components/markupEditor/MarkupEditor';
+import displayError from '@/helpers/errorHandling/displayError';
+import Button from '@/components/button/Button';
+import LoadingButton from '@/components/loadingButton/LoadingButton';
 
 function AddNewProject(): JSX.Element {
   const { authUser } = useAuth();
@@ -139,11 +139,7 @@ function AddNewProject(): JSX.Element {
             <Controller
               control={control}
               name="description"
-              render={({
-                field: { onChange, onBlur, value, name, ref },
-                fieldState: { invalid, isTouched, isDirty, error },
-                formState
-              }) => (
+              render={({ field: { onChange, onBlur, value } }) => (
                 <MarkupEditor
                   title="Description"
                   onBlur={onBlur}

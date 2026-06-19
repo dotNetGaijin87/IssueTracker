@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
-import { adapter } from '../../adapters/adapter';
-import { User } from '../../models/user/user';
+import { adapter } from '@/adapters/adapter';
+import { User } from '@/models/user/user';
 import UsersTable from './UsersTable';
 import UsersSearch from './ActionBar';
 import React from 'react';
-import LoadingPage from '../../layout/common/LoadingPage';
-import Pagination from '../../components/pagination/Pagination';
-import displayError from '../../helpers/errorHandling/displayError';
+import LoadingPage from '@/layout/common/LoadingPage';
+import Pagination from '@/components/pagination/Pagination';
+import displayError from '@/helpers/errorHandling/displayError';
 
 function UsersPage() {
   const [lodaing, setLoading] = React.useState(false);
@@ -19,7 +19,7 @@ function UsersPage() {
     const run = async () => {
       try {
         setLoading(true);
-        let resp = await adapter.User.list(searchCriteria);
+        const resp = await adapter.User.list(searchCriteria);
         setUsers(resp.users);
         setPageCount(resp.pageCount);
         setPage(resp.page);

@@ -10,20 +10,25 @@ interface Props {
 
 function TooltipNavButtonBase({ title, routeTo, icon }: Props) {
   return (
-    <Tooltip
-      title={title}
-      sx={{
-        color: 'text.icon',
-        '&:hover': {
-          bgcolor: 'transparent'
-        },
-        '&.active': {
-          color: 'secondary.main'
-        }
-      }}
-      placement="right"
-    >
-      <IconButton component={NavLink} to={routeTo}>
+    <Tooltip title={title} placement="right">
+      <IconButton
+        component={NavLink}
+        to={routeTo}
+        sx={{
+          color: 'text.secondary',
+          borderRadius: 2,
+          my: 0.5,
+          transition: 'color .15s ease, background-color .15s ease',
+          '&:hover': {
+            color: 'text.primary',
+            bgcolor: 'action.hover'
+          },
+          '&.active': {
+            color: 'primary.main',
+            bgcolor: 'action.selected'
+          }
+        }}
+      >
         {icon}
       </IconButton>
     </Tooltip>

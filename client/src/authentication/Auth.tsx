@@ -1,10 +1,11 @@
+/* eslint-disable react-refresh/only-export-components */
 import React from 'react';
 import createAuth0Client, { Auth0Client } from '@auth0/auth0-spa-js';
-import { authSettings } from '../AppSettings';
-import { adapter } from '../adapters/adapter';
-import { UserRole } from '../models/user/userRole';
-import extractUserRole from '../helpers/auth/extractUserRole';
-import extractUserId from '../helpers/auth/extractUserId';
+import { authSettings } from '@/AppSettings';
+import { adapter } from '@/adapters/adapter';
+import { UserRole } from '@/models/user/userRole';
+import extractUserRole from '@/helpers/auth/extractUserRole';
+import extractUserId from '@/helpers/auth/extractUserId';
 
 interface Auth0User {
   name?: string;

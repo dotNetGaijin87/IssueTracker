@@ -1,4 +1,4 @@
-import { IssueProgress } from '../../models/issue/issueProgress';
+import { IssueProgress } from '@/models/issue/issueProgress';
 import issueProgressList from './issueProgress/issueProgressList';
 
 interface Props {

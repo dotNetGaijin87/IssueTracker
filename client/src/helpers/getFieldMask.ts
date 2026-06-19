@@ -1,6 +1,6 @@
 type FieldMask = string[];
 
-function getFieldMask(resource: Object): string[] {
+function getFieldMask(resource: object): string[] {
   const fieldMask: FieldMask = [];
 
   for (const [key, value] of Object.entries(resource)) {
