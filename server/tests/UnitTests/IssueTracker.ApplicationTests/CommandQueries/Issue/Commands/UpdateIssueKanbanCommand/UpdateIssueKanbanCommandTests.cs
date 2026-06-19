@@ -74,7 +74,7 @@ public class UpdateIssueKanbanCommandTests
         var command = new UpdateIssueKanbanCommand()
         {
             IssueId = "Issue_1",
-            UserCredentials = new UserCredentials { Name = "User_1"},
+            UserCredentials = new UserCredentials { Id = "User_1" },
             Progress = newProgress,
             Permissions = new List<Permission> 
             { 

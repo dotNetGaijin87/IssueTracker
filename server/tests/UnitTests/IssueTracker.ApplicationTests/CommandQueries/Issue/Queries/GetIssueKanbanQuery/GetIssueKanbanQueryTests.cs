@@ -68,7 +68,7 @@ public class GetIssueKanbanQueryTests
         });
         dbContext.SaveChanges();
         var mapper = AutoMapperHelpers.CreateAutoMapper();
-        var command = new GetIssueKanbanQuery() { UserCredentials = new UserCredentials {Name="User_1" } };
+        var command = new GetIssueKanbanQuery() { UserCredentials = new UserCredentials { Id = "User_1" } };
         var handler = new GetIssueKanbanQueryHandler(dbContext, mapper);
 
         // ACT
