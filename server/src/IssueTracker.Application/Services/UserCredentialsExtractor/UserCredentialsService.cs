@@ -1,5 +1,5 @@
 ﻿using IssueTracker.Application.Utils;
-using IssueTracker.Application.Intrefaces;
+using IssueTracker.Application.Interfaces;
 using IssueTracker.Domain.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;

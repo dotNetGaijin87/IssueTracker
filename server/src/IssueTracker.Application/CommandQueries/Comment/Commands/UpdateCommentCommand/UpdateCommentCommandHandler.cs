@@ -39,7 +39,7 @@ public class UpdateCommentCommandHandler : IRequestHandler<UpdateCommentCommand,
         }
         catch (Exception ex)
         {
-            throw new UpdateCommentCommandException($"Updating the comment \"{cmd.Id }\" error.", ex);
+            throw new UpdateCommentCommandException($"Updating the comment \"{cmd.Id}\" error.", ex);
         }
     }
 }

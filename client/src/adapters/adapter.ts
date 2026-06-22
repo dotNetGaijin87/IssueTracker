@@ -32,7 +32,7 @@ function getConfig(accessToken: string = '') {
   else {
     return {
       timeout: 5000,
-      headers: { authorization: `bearer ${accessToken}` }
+      headers: { authorization: `Bearer ${accessToken}` }
     };
   }
 }

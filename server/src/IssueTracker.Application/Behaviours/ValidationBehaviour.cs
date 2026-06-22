@@ -24,9 +24,8 @@ namespace IssueTracker.Application.Shared.Behaviours
                                                 .Where(f => f != null)
                                                 .ToList();
 
-
-                foreach (var failure in failures)
-                    throw new ValidationException(String.Join("|", failures.ToList()));
+                if (failures.Any())
+                    throw new ValidationException(String.Join("|", failures));
             }
 
             return await next();

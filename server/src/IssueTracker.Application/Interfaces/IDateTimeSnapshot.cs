@@ -1,4 +1,4 @@
-﻿namespace IssueTracker.Application.Intrefaces;
+﻿namespace IssueTracker.Application.Interfaces;
 
 public interface IDateTimeSnapshot
 {

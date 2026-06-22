@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 using IssueTracker.Application.Behaviours;
-using IssueTracker.Application.Intrefaces;
+using IssueTracker.Application.Interfaces;
 using IssueTracker.Application.Services.DateTimeSnapshot;
 using IssueTracker.Application.Services.IdentityService;
 using IssueTracker.Application.Services.UserRoleService;

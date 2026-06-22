@@ -1,7 +1,7 @@
 ﻿using IssueTracker.Application.Attributes;
 using IssueTracker.Domain.Models.Enums;
 
-namespace IssueTracker.Application.Intrefaces;
+namespace IssueTracker.Application.Interfaces;
 
 public interface IAuthService
 {

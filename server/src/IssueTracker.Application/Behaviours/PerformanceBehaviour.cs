@@ -33,7 +33,7 @@ namespace IssueTracker.Application.Shared.Behaviours
             {
                 var requestName = typeof(TRequest).Name;
 
-                _logger.LogWarning("Laser Long Running Request: " +
+                _logger.LogWarning("Long Running Request: " +
                                     "{Name} ({ElapsedMilliseconds} milliseconds) {@Request}",
                                     requestName, elapsedMilliseconds, request);
             }

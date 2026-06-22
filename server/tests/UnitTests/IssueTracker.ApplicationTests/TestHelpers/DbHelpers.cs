@@ -1,4 +1,4 @@
-﻿using IssueTracker.Application.Intrefaces;
+﻿using IssueTracker.Application.Interfaces;
 using IssueTracker.Domain.Models;
 using IssueTracker.Domain.Models.Enums;
 using IssueTracker.Infrastructure.Services.AppDbContext;

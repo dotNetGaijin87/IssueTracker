@@ -1,6 +1,6 @@
 ﻿using IssueTracker.Application.Utils;
 using IssueTracker.Application.Interfaces;
-using IssueTracker.Application.Intrefaces;
+using IssueTracker.Application.Interfaces;
 using IssueTracker.Domain.Models;
 using IssueTracker.Domain.Models.Enums;
 using Microsoft.EntityFrameworkCore;

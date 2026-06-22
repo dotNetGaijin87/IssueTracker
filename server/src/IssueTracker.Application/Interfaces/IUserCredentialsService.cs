@@ -1,6 +1,6 @@
 ﻿using IssueTracker.Domain.Models;
 
-namespace IssueTracker.Application.Intrefaces;
+namespace IssueTracker.Application.Interfaces;
 
 public interface IUserCredentialsService
 {

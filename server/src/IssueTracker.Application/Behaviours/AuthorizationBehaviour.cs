@@ -1,5 +1,5 @@
 ﻿using IssueTracker.Application.Attributes;
-using IssueTracker.Application.Intrefaces;
+using IssueTracker.Application.Interfaces;
 using IssueTracker.Application.Models;
 using IssueTracker.Application.Shared.Exceptions;
 using MediatR;

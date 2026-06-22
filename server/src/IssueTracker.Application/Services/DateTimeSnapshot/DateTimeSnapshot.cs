@@ -1,4 +1,4 @@
-﻿using IssueTracker.Application.Intrefaces;
+﻿using IssueTracker.Application.Interfaces;
 
 namespace IssueTracker.Application.Services.DateTimeSnapshot;
 
