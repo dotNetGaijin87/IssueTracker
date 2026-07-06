@@ -167,7 +167,7 @@ export default function AssigneesSetter({
       }}
       renderInput={(params) => (
         <TextField
-          sx={{ margin: 0, widht: 'inherit' }}
+          sx={{ margin: 0, width: 'inherit' }}
           {...params}
           InputProps={{
             ...params.InputProps
