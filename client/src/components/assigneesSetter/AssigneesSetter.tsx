@@ -37,7 +37,7 @@ export default function AssigneesSetter({
     string[]
   >([]);
   const [loading, setLoading] = React.useState(false);
-  const isNewIssue = issueId ? false : true;
+  const isNewIssue = !issueId;
 
   React.useEffect(() => {
     return delayExec(async () => {
