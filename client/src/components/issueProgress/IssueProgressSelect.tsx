@@ -27,7 +27,7 @@ function IssueProgressSelect({
 
   const update = (e: any) => {
     const value = e.target.value;
-    setValue(e.target.value);
+    setValue(value);
     if (onChange) {
       if (value === IssueProgress.Unspecified) {
         onChange(undefined);

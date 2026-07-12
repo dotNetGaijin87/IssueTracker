@@ -34,7 +34,6 @@ function ProjectProgressSelect({
         onChange(undefined);
       } else {
         onChange(value);
-        console.log(value);
       }
     }
   };
