@@ -52,7 +52,7 @@ const Kanban = ({ cards }) => {
           .map((progressStatus) => {
             const sortedCards = cards
               .filter((x) => x.progress === progressStatus.value)
-              .sort((x) => x.position)
+              .sort((a, b) => a.position - b.position)
               .map((p) => ({
                 id: p.id,
                 projectId: p.projectId,
