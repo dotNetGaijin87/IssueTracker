@@ -75,6 +75,7 @@ function IssueDetailsComments({ permissions }: Props) {
 
         {comments?.map((comment) => (
           <Comment
+            key={comment.id}
             comment={comment}
             onCommentStateChanged={handleCommentStateChanged}
           />

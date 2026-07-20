@@ -1,5 +1,4 @@
 ﻿using IssueTracker.Application.Interfaces;
-using IssueTracker.Application.Interfaces;
 using IssueTracker.Infrastructure.Services.AppDbContext;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
