@@ -65,8 +65,6 @@ describe('issueCapabilities', () => {
   });
 
   it('does not let a privileged role be masked by a weaker permission', () => {
-    // Regression: the old branch checked `isAdminOrManager` a second time in an
-    // unreachable `else if`, so this combination depended on ordering.
     expect(
       issueCapabilities({
         permission: IssuePermission.CanModify,

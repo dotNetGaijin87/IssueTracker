@@ -50,8 +50,6 @@ describe('StatusSelect', () => {
   });
 
   it('reports the newly selected value, not the previous one', async () => {
-    // Regression: the old IssuePrioritySelect called onChange with the stale
-    // state value, so picking "High" reported "Low".
     const onChange = vi.fn();
     const user = userEvent.setup();
     render(<Harness onChange={onChange} />);
@@ -64,8 +62,6 @@ describe('StatusSelect', () => {
   });
 
   it('keeps every option available after a selection', async () => {
-    // Regression: the old component pruned the chosen option out of its own
-    // list, permanently shrinking the dropdown.
     const user = userEvent.setup();
     render(<Harness />);
 

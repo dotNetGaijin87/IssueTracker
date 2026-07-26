@@ -20,21 +20,15 @@ export type StatusSelectProps<T extends string> = {
   label?: string;
   disabled?: boolean;
   fullWidth?: boolean;
-  /** Adds the "no filter" entry that maps to `undefined`. */
   includeAny?: boolean;
   anyLabel?: string;
 };
 
-/** What a domain-bound select exposes once its options and registry are fixed. */
 export type BoundStatusSelectProps<T extends string> = Omit<
   StatusSelectProps<T>,
   'options' | 'registry'
 >;
 
-/**
- * Fully controlled: the selected value lives with the caller (react-hook-form
- * or filter state), never in a second copy inside this component.
- */
 function StatusSelect<T extends string>({
   value,
   options,

@@ -188,8 +188,6 @@ function AssigneesSetter({ issueId, disabled = false, onChange }: Props) {
       }}
       renderInput={(params) => (
         <TextField
-          // MUI types its own `AutocompleteRenderInputParams` with optional
-          // props that `exactOptionalPropertyTypes` rejects on TextField.
           {...(params as TextFieldProps)}
           sx={{ margin: 0, width: 'inherit' }}
           disabled={disabled}

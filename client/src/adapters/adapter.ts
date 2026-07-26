@@ -22,16 +22,11 @@ const CommentListSchema = paginatedSchema('comments', IssueCommentSchema);
 const PermissionListSchema = paginatedSchema('permissions', PermissionSchema);
 const KanbanCardsSchema = z.array(KanbanCardSchema);
 
-/**
- * Filter fields carry an explicit `| undefined` — unlike the entity models,
- * "cleared filter" is a value callers actively assign, not a missing key.
- */
 type PageCriteria = {
   page?: number | undefined;
   pageSize?: number | undefined;
 };
 
-/** Only the three PATCH commands that declare a `FieldMask` server-side. */
 function withFieldMask<T extends Record<string, unknown>>(data: T) {
   return { FieldMask: getFieldMask(data), ...data };
 }

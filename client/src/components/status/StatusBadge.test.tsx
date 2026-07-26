@@ -6,8 +6,6 @@ import StatusBadge from './StatusBadge';
 
 describe('StatusBadge', () => {
   it('renders the label for every member of the union', () => {
-    // The registry is a total Record, so a new union member would fail to
-    // compile rather than silently rendering an empty badge as before.
     for (const progress of issueProgresses) {
       const { unmount } = render(
         <StatusBadge value={progress} registry={issueProgressBadges} />

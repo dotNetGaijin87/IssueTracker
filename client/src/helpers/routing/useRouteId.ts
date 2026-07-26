@@ -6,7 +6,6 @@ import {
   type ProjectId
 } from '@/models/ids';
 
-/** Route params are strings; branding them here keeps the casts at the edge. */
 export function useProjectId(): ProjectId | undefined {
   const { projectId } = useParams<{ projectId: string }>();
   const result = ProjectIdSchema.safeParse(projectId);

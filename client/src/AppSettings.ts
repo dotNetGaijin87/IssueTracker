@@ -1,10 +1,6 @@
 import type { Auth0ClientOptions } from '@auth0/auth0-spa-js';
 import { z } from 'zod';
 
-/**
- * Defaults are the public dev-tenant values documented in `.env.example`; the
- * Docker image builds without a `.env`, so they have to remain reachable.
- */
 const EnvSchema = z.object({
   VITE_API_URL: z.url().default('http://localhost:7000'),
   VITE_AUTH0_DOMAIN: z.string().min(1).default('dev-m3ve8sir.us.auth0.com'),

@@ -1,6 +1,5 @@
 import { z } from 'zod';
 
-/** Mirrors `IssueTracker.Domain.Models.Enums.IssuePermission` on the server. */
 export const IssuePermission = {
   None: 'None',
   CanModify: 'CanModify',

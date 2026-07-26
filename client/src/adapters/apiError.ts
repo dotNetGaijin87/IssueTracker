@@ -1,6 +1,5 @@
 import { z } from 'zod';
 
-/** `Hellang.Middleware.ProblemDetails` shape returned by the API on failure. */
 const ProblemDetailsSchema = z.object({
   title: z.string().optional(),
   detail: z.string().optional(),
@@ -28,7 +27,6 @@ function hasResponseData(error: unknown): error is {
   return typeof error === 'object' && error !== null;
 }
 
-/** Normalises anything thrown by axios, zod or user code into an `ApiError`. */
 export function toApiError(error: unknown, fallbackMessage: string): ApiError {
   if (isApiError(error)) return error;
 

@@ -45,9 +45,6 @@ export default tseslint.config(
       '@typescript-eslint/no-floating-promises': 'error',
       '@typescript-eslint/no-misused-promises': 'error',
       '@typescript-eslint/no-unnecessary-condition': 'error',
-      // Request/criteria types must stay `type` aliases: only those get an
-      // implicit index signature, which is what makes them assignable to
-      // the `QueryParams` record the HTTP layer takes.
       '@typescript-eslint/consistent-type-definitions': 'off'
     }
   },

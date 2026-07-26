@@ -8,8 +8,4 @@ export type BadgeSpec = {
   icon?: ReactNode;
 };
 
-/**
- * A total map from a status union to its presentation. Adding a member to the
- * union turns every incomplete registry into a compile error.
- */
 export type BadgeRegistry<T extends string> = Readonly<Record<T, BadgeSpec>>;

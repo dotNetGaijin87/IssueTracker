@@ -9,11 +9,6 @@ function isPlainObject(value: unknown): value is Record<string, unknown> {
   );
 }
 
-/**
- * Builds the `FieldMask` the API uses to decide which properties a PATCH
- * touches. Arrays and dates are leaves — recursing into them would emit
- * index paths the server cannot resolve.
- */
 function getFieldMask(resource: Record<string, unknown>): FieldMask {
   const fieldMask: FieldMask = [];
 

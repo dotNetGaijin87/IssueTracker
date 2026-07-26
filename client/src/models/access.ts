@@ -15,10 +15,6 @@ export function isPrivilegedRole(role: UserRole | undefined): boolean {
   return role === UserRole.admin || role === UserRole.manager;
 }
 
-/**
- * `CanDelete` subsumes `CanModify`; expressing that once here stops every
- * caller from re-deriving the hierarchy by hand.
- */
 export function issueCapabilities(input: {
   permission?: IssuePermission | undefined;
   role?: UserRole | undefined;

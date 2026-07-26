@@ -7,7 +7,6 @@ export type StatusBadgeProps<T extends string> = {
   variant?: BadgeVariant;
 };
 
-/** What a domain-bound badge exposes once its registry is fixed. */
 export type BoundStatusBadgeProps<T extends string> = Omit<
   StatusBadgeProps<T>,
   'registry'

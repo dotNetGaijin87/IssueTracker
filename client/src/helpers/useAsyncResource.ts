@@ -7,11 +7,6 @@ export type AsyncResource<T> = {
   reload: () => void;
 };
 
-/**
- * Loads `load()` into state, cancelling the state update if the component
- * unmounts or the loader changes first. Pass a `useCallback`-stable `load` so
- * the exhaustive-deps rule can still verify what triggers a refetch.
- */
 export function useAsyncResource<T>(
   load: () => Promise<T>,
   initial: T,

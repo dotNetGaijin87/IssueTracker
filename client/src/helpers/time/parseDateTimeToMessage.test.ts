@@ -3,11 +3,6 @@ import parseDateTimeToMessage from './parseDateTimeToMessage';
 
 const NOW = new Date('2024-06-01T12:00:00.000Z');
 
-/**
- * The formatter deliberately follows the runtime locale, so expectations are
- * built with the same primitive: what is under test is which unit and count
- * the thresholds pick, not how Intl words them.
- */
 const relativeTime = new Intl.RelativeTimeFormat(undefined, {
   numeric: 'auto'
 });
@@ -44,7 +39,6 @@ describe('parseDateTimeToMessage', () => {
   });
 
   it('does not round a fresh timestamp up to a whole second', () => {
-    // The old implementation used Math.ceil, so 0.2s old read as "1 seconds ago".
     expect(parseDateTimeToMessage(secondsAgo(0.2))).toBe(
       relativeTime.format(0, 'second')
     );
