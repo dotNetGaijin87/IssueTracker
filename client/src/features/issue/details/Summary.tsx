@@ -1,155 +1,132 @@
 import { useState } from 'react';
 import { Box, Divider, Grow, TextField, Typography } from '@mui/material';
-import { useParams } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
-import { adapter } from '@/adapters/adapter';
-import DeleteIcon from '@mui/icons-material/Delete';
-import SaveIcon from '@mui/icons-material/Save';
-import EditIcon from '@mui/icons-material/Edit';
+import { toast } from 'react-toastify';
+import { Controller, useForm } from 'react-hook-form';
 import BookmarkAddIcon from '@mui/icons-material/BookmarkAdd';
 import BookmarkRemoveIcon from '@mui/icons-material/BookmarkRemove';
 import CancelIcon from '@mui/icons-material/Cancel';
-import { toast } from 'react-toastify';
-import displayError from '@/helpers/errorHandling/displayError';
-import { Controller, useForm } from 'react-hook-form';
+import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
+import SaveIcon from '@mui/icons-material/Save';
+import { adapter, type UpdateIssueRequest } from '@/adapters/adapter';
+import { useAuth } from '@/authentication/Auth';
+import ButtonIconWithConfirmationDialog from '@/components/buttonIconWithConfirmationDialog/ButtonIconWithConfirmationDialog';
 import FormFieldWrapper from '@/components/formFieldWrapper/FormFieldWrapper';
-import safelyConvertDateTime from '@/helpers/time/safelyConvertDateTime';
+import IssuePriorityBadge from '@/components/issuePriority/IssuePriorityBadge';
+import IssuePrioritySelect from '@/components/issuePriority/IssuePrioritySelect';
+import IssueProgressBadge from '@/components/issueProgress/IssueProgressBadge';
+import IssueProgressSelect from '@/components/issueProgress/IssueProgressSelect';
+import IssueTypeSelect from '@/components/issueType/IssueTypeSelect';
 import MarkupEditor from '@/components/markupEditor/MarkupEditor';
 import Panel from '@/components/panel/Panel';
 import TooltipActionButton from '@/components/tooltipActionButton/TooltipActionButton';
-import ButtonIconWithConfirmationDialog from '@/components/buttonIconWithConfirmationDialog/ButtonIconWithConfirmationDialog';
-import { Issue } from '@/models/issue/issue';
-import { IssueProgress } from '@/models/issue/issueProgress';
-import IssueProgressBadge from '@/components/issueProgress/IssueProgressBadge';
-import IssueProgressSelect from '@/components/issueProgress/IssueProgressSelect';
-import { IssueType } from '@/models/issue/issueType';
-import IssueTypeSelect from '@/components/issueType/IssueTypeSelect';
-import { IssuePriority } from '@/models/issue/issuePriority';
-import IssuePrioritySelect from '@/components/issuePriority/IssuePrioritySelect';
-import IssuePriorityBadge from '@/components/issuePriority/IssuePriorityBadge';
 import VerticalDivider from '@/components/verticalDivider/VerticalDivider';
-import { IssuePermission } from '@/models/issue/issuePermission';
-import { useAuth } from '@/authentication/Auth';
-import { Permission } from '@/models/permission/permission';
-import hasAdminOrManagerRole from '@/helpers/auth/hasAdminOrManagerRole';
+import displayError from '@/helpers/errorHandling/displayError';
+import { SUMMARY_RULE } from '@/helpers/forms/validationRules';
 import parseDateTimeToMessage from '@/helpers/time/parseDateTimeToMessage';
+import safelyConvertDateTime from '@/helpers/time/safelyConvertDateTime';
+import type { Capabilities } from '@/models/access';
+import type { Issue } from '@/models/issue/issue';
+import { IssuePermission } from '@/models/issue/issuePermission';
+import { IssuePriority } from '@/models/issue/issuePriority';
+import { IssueProgress } from '@/models/issue/issueProgress';
+import { IssueType } from '@/models/issue/issueType';
+
+type FormValues = Omit<UpdateIssueRequest, 'id'>;
 
 interface Props {
-  issue: Issue | undefined;
-  initialPermission?: Permission;
+  issue: Issue;
+  capabilities: Capabilities;
 }
 
-function IssueDetailsSummary({ issue, initialPermission }: Props): JSX.Element {
+function IssueDetailsSummary({ issue, capabilities }: Props) {
   const { authUser } = useAuth();
   const navigate = useNavigate();
   const [editing, setEditing] = useState(false);
   const [updating, setUpdating] = useState(false);
-  const { projectId } = useParams<{ projectId: string }>();
+  const [current, setCurrent] = useState(issue);
   const [pinnedToKanban, setPinnedToKanban] = useState(
-    initialPermission?.isPinnedToKanban
+    issue.permission?.isPinnedToKanban ?? false
   );
-
-  const isAdminOrManager = hasAdminOrManagerRole(authUser?.role);
-
-  const evaluatePermission = () => {
-    const permissions: IssuePermission[] = [];
-    if (
-      initialPermission?.issuePermission === IssuePermission.CanDelete ||
-      isAdminOrManager
-    ) {
-      permissions.push(IssuePermission.CanDelete);
-      permissions.push(IssuePermission.CanModify);
-      return permissions;
-    } else if (
-      initialPermission?.issuePermission === IssuePermission.CanModify ||
-      isAdminOrManager
-    ) {
-      permissions.push(IssuePermission.CanModify);
-    }
-
-    return permissions;
-  };
-  const permissions = evaluatePermission();
 
   const {
     register,
     formState: { errors },
     handleSubmit,
     control,
-    getValues,
     reset
-  } = useForm<Issue>({
-    defaultValues: issue,
+  } = useForm<FormValues>({
+    defaultValues: {
+      summary: issue.summary,
+      description: issue.description,
+      type: issue.type,
+      progress: issue.progress,
+      priority: issue.priority
+    },
     mode: 'all'
   });
 
-  const handleIssueUpdate = async () => {
-    setUpdating(true);
-    await handleSubmit(async (data) => {
-      try {
-        const issue = await adapter.Issue.update({
-          id: data.id,
-          summary: data.summary,
-          description: data.description,
-          type: data.type,
-          progress: data.progress,
-          priority: data.priority
-        });
-        reset(issue);
-        toast.success('Data updated');
-      } catch (ex) {
-        displayError(ex, 'Updating data error');
-      }
-      setUpdating(false);
-      setEditing(false);
-    })();
-  };
+  const readOnly = !capabilities.canModify || !editing;
 
-  const handlePermissionUpdate = async (isPinnedToKanban: boolean) => {
-    await handleSubmit(async () => {
-      try {
-        if (!initialPermission && isAdminOrManager) {
-          await adapter.Permission.create({
-            userId: authUser?.name,
-            issueId: issue?.id,
-            isPinnedToKanban: isPinnedToKanban,
-            issuePermission: IssuePermission.CanDelete
-          });
-        } else {
-          await adapter.Permission.update({
-            userId: authUser?.name,
-            issueId: issue?.id,
-            isPinnedToKanban: isPinnedToKanban,
-            issuePermission: IssuePermission.CanModify
-          });
-        }
-
-        setPinnedToKanban(isPinnedToKanban);
-        isPinnedToKanban
-          ? toast.success('Issue added to the kanban board')
-          : toast.success('Issue removed from the kanban board');
-      } catch (ex) {
-        displayError(ex, 'Removing issue from the kanban board error');
-      }
-    })();
-  };
-
-  const handleIssueRemoval = async (name: string) => {
+  const handleIssueUpdate = handleSubmit(async (values) => {
     try {
-      await adapter.Issue.delete(name);
-      navigate(`/projects/${projectId}/issues`);
-      toast.success('Issue removed');
-    } catch (ex: any) {
-      displayError(ex, 'Removing issue error');
+      setUpdating(true);
+      const updated = await adapter.Issue.update({ id: issue.id, ...values });
+      setCurrent(updated);
+      reset({
+        summary: updated.summary,
+        description: updated.description,
+        type: updated.type,
+        progress: updated.progress,
+        priority: updated.priority
+      });
+      toast.success('Data updated');
+      setEditing(false);
+    } catch (error) {
+      displayError(error, 'Updating data error');
+    } finally {
+      setUpdating(false);
+    }
+  });
+
+  const handlePinnedChange = async (isPinnedToKanban: boolean) => {
+    if (authUser?.id === undefined) return;
+
+    const payload = {
+      userId: authUser.id,
+      issueId: issue.id,
+      isPinnedToKanban,
+      issuePermission: issue.permission
+        ? IssuePermission.CanModify
+        : IssuePermission.CanDelete
+    };
+
+    try {
+      if (issue.permission) {
+        await adapter.Permission.update(payload);
+      } else {
+        await adapter.Permission.create(payload);
+      }
+      setPinnedToKanban(isPinnedToKanban);
+      toast.success(
+        isPinnedToKanban
+          ? 'Issue added to the kanban board'
+          : 'Issue removed from the kanban board'
+      );
+    } catch (error) {
+      displayError(error, 'Updating the kanban board failed');
     }
   };
 
-  const handleEditing = () => {
-    setEditing(true);
-  };
-
-  const handleCancelEditing = () => {
-    setEditing(false);
+  const handleIssueRemoval = async () => {
+    try {
+      await adapter.Issue.delete(issue.id);
+      navigate(`/projects/${issue.projectId}/issues`);
+      toast.success('Issue removed');
+    } catch (error) {
+      displayError(error, 'Removing issue error');
+    }
   };
 
   return (
@@ -168,48 +145,39 @@ function IssueDetailsSummary({ issue, initialPermission }: Props): JSX.Element {
               alignItems="center"
               sx={{ color: 'text.icon' }}
             >
-              <Typography variant="h6">{getValues('id')}</Typography>
+              <Typography variant="h6">{current.id}</Typography>
               <VerticalDivider />
-              <Typography>{getValues('type')}</Typography>
+              <Typography>{current.type}</Typography>
               <VerticalDivider />
               {!updating && (
                 <>
-                  <IssuePriorityBadge
-                    value={getValues('priority') as IssuePriority}
-                  />
-
-                  <IssueProgressBadge
-                    value={getValues('progress') as IssueProgress}
-                  />
+                  <IssuePriorityBadge value={current.priority} />
+                  <IssueProgressBadge value={current.progress} />
                 </>
               )}
             </Box>
             <Box display="flex">
-              {permissions.includes(IssuePermission.CanDelete) && (
-                <>
-                  <ButtonIconWithConfirmationDialog
-                    hoverOverTitle={'Delete Issue'}
-                    dialogText={'Delete Issue?'}
-                    icon={<DeleteIcon />}
-                    onConfirm={async () => {
-                      await handleIssueRemoval(getValues('id'));
-                    }}
-                  />
-                </>
+              {capabilities.canDelete && (
+                <ButtonIconWithConfirmationDialog
+                  hoverOverTitle="Delete Issue"
+                  dialogText="Delete Issue?"
+                  icon={<DeleteIcon />}
+                  onConfirm={handleIssueRemoval}
+                />
               )}
-              {permissions.includes(IssuePermission.CanModify) && (
+              {capabilities.canModify && (
                 <>
                   {pinnedToKanban ? (
                     <TooltipActionButton
-                      title={'Remove from kanban'}
+                      title="Remove from kanban"
                       icon={<BookmarkRemoveIcon />}
-                      onClick={async () => await handlePermissionUpdate(false)}
+                      onClick={() => handlePinnedChange(false)}
                     />
                   ) : (
                     <TooltipActionButton
-                      title={'Add to kanban'}
+                      title="Add to kanban"
                       icon={<BookmarkAddIcon />}
-                      onClick={async () => await handlePermissionUpdate(true)}
+                      onClick={() => handlePinnedChange(true)}
                     />
                   )}
 
@@ -218,22 +186,26 @@ function IssueDetailsSummary({ issue, initialPermission }: Props): JSX.Element {
                       <Box display="flex">
                         <VerticalDivider />
                         <TooltipActionButton
-                          title={'Save changes'}
+                          title="Save changes"
                           icon={<SaveIcon />}
                           onClick={handleIssueUpdate}
                         />
                         <TooltipActionButton
-                          title={'Cancel changes'}
+                          title="Cancel changes"
                           icon={<CancelIcon />}
-                          onClick={handleCancelEditing}
+                          onClick={() => {
+                            setEditing(false);
+                          }}
                         />
                       </Box>
                     </Grow>
                   ) : (
                     <TooltipActionButton
-                      title={'Edit Issue'}
+                      title="Edit Issue"
                       icon={<EditIcon />}
-                      onClick={handleEditing}
+                      onClick={() => {
+                        setEditing(true);
+                      }}
                     />
                   )}
                 </>
@@ -249,9 +221,7 @@ function IssueDetailsSummary({ issue, initialPermission }: Props): JSX.Element {
           sx={{ color: 'text.icon', m: 0.5 }}
         >
           <Typography variant="subtitle2">
-            {`Created ${parseDateTimeToMessage(
-              getValues('creationTime')
-            )} by ${getValues('createdBy')}`}
+            {`Created ${parseDateTimeToMessage(current.creationTime)} by ${current.createdBy}`}
           </Typography>
         </Box>
       </Box>
@@ -260,24 +230,11 @@ function IssueDetailsSummary({ issue, initialPermission }: Props): JSX.Element {
           <FormFieldWrapper title="Summary" highlighted={editing}>
             <TextField
               fullWidth
-              disabled={
-                !permissions.includes(IssuePermission.CanModify) || !editing
-              }
+              disabled={readOnly}
               size="small"
-              error
-              helperText={
-                (errors.summary?.type === 'required' &&
-                  'Your input is required') ||
-                (errors.summary?.type === 'minLength' &&
-                  'Your input is below minimum of 10 characters') ||
-                (errors.summary?.type === 'maxLength' &&
-                  'Your input exceeds maximum of 100 characters')
-              }
-              {...register('summary', {
-                required: true,
-                minLength: 10,
-                maxLength: 100
-              })}
+              error={errors.summary !== undefined}
+              helperText={errors.summary?.message}
+              {...register('summary', SUMMARY_RULE)}
             />
           </FormFieldWrapper>
           <FormFieldWrapper title="Priority" highlighted={editing}>
@@ -286,12 +243,13 @@ function IssueDetailsSummary({ issue, initialPermission }: Props): JSX.Element {
               name="priority"
               render={({ field }) => (
                 <IssuePrioritySelect
-                  args={field}
                   fullWidth
-                  disabled={
-                    !permissions.includes(IssuePermission.CanModify) || !editing
-                  }
-                  defaultValue={IssuePriority.Low}
+                  disabled={readOnly}
+                  value={field.value}
+                  onBlur={field.onBlur}
+                  onChange={(value) => {
+                    field.onChange(value ?? IssuePriority.Low);
+                  }}
                 />
               )}
             />
@@ -302,12 +260,13 @@ function IssueDetailsSummary({ issue, initialPermission }: Props): JSX.Element {
               name="type"
               render={({ field }) => (
                 <IssueTypeSelect
-                  args={field}
                   fullWidth
-                  disabled={
-                    !permissions.includes(IssuePermission.CanModify) || !editing
-                  }
-                  defaultValue={IssueType.Bug}
+                  disabled={readOnly}
+                  value={field.value}
+                  onBlur={field.onBlur}
+                  onChange={(value) => {
+                    field.onChange(value ?? IssueType.Bug);
+                  }}
                 />
               )}
             />
@@ -318,57 +277,44 @@ function IssueDetailsSummary({ issue, initialPermission }: Props): JSX.Element {
               name="progress"
               render={({ field }) => (
                 <IssueProgressSelect
-                  args={field}
                   fullWidth
-                  disabled={
-                    !permissions.includes(IssuePermission.CanModify) || !editing
-                  }
-                  defaultValue={IssueProgress.Canceled}
+                  disabled={readOnly}
+                  value={field.value}
+                  onBlur={field.onBlur}
+                  onChange={(value) => {
+                    field.onChange(value ?? IssueProgress.ToDo);
+                  }}
                 />
               )}
             />
           </FormFieldWrapper>
           <FormFieldWrapper title="Creation Time">
-            <Controller
-              control={control}
-              name="creationTime"
-              render={({ field: { value } }) => (
-                <TextField
-                  fullWidth
-                  disabled
-                  size="small"
-                  value={safelyConvertDateTime(value)}
-                />
-              )}
+            <TextField
+              fullWidth
+              disabled
+              size="small"
+              value={safelyConvertDateTime(current.creationTime)}
             />
           </FormFieldWrapper>
           <FormFieldWrapper title="Completion Time">
-            <Controller
-              control={control}
-              name="completionTime"
-              render={({ field: { value } }) => (
-                <TextField
-                  fullWidth
-                  disabled
-                  size="small"
-                  value={safelyConvertDateTime(value)}
-                />
-              )}
+            <TextField
+              fullWidth
+              disabled
+              size="small"
+              value={safelyConvertDateTime(current.completionTime)}
             />
           </FormFieldWrapper>
         </div>
         <Controller
           control={control}
           name="description"
-          render={({ field: { onChange, onBlur, value } }) => (
+          render={({ field }) => (
             <MarkupEditor
               title="Description"
-              value={value}
-              disabled={
-                !permissions.includes(IssuePermission.CanModify) || !editing
-              }
-              onBlur={onBlur}
-              onChange={onChange}
+              value={field.value}
+              disabled={readOnly}
+              onBlur={field.onBlur}
+              onChange={field.onChange}
             />
           )}
         />

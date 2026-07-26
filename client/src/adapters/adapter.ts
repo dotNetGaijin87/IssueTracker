@@ -1,142 +1,192 @@
-import axios, { AxiosError, AxiosResponse } from 'axios';
-import { baseUrl } from '@/AppSettings';
-import { getAccessToken } from '@/authentication/Auth';
-import createQueryString from '@/helpers/createQueryString';
+import { z } from 'zod';
 import getFieldMask from '@/helpers/getFieldMask';
+import { IssueCommentSchema } from '@/models/comment/issueComment';
+import type { CommentId, IssueId, ProjectId, UserId } from '@/models/ids';
+import { IssueSchema } from '@/models/issue/issue';
+import type { IssuePermission } from '@/models/issue/issuePermission';
+import type { IssuePriority } from '@/models/issue/issuePriority';
+import type { IssueProgress } from '@/models/issue/issueProgress';
+import type { IssueType } from '@/models/issue/issueType';
+import { KanbanCardSchema } from '@/models/kanbanCard/kanbanCard';
+import { paginatedSchema } from '@/models/pagination';
+import { PermissionSchema } from '@/models/permission/permission';
+import { ProjectSchema } from '@/models/project/project';
+import type { ProjectProgress } from '@/models/project/projectProgress';
+import { UserSchema } from '@/models/user/user';
+import { request } from './http';
 
-axios.defaults.baseURL = baseUrl;
-const getRespBody = (response: AxiosResponse) => response.data;
+const IssueListSchema = paginatedSchema('issues', IssueSchema);
+const ProjectListSchema = paginatedSchema('projects', ProjectSchema);
+const UserListSchema = paginatedSchema('users', UserSchema);
+const CommentListSchema = paginatedSchema('comments', IssueCommentSchema);
+const PermissionListSchema = paginatedSchema('permissions', PermissionSchema);
+const KanbanCardsSchema = z.array(KanbanCardSchema);
 
-axios.interceptors.response.use(
-  (response) => {
-    return response;
-  },
-  (error: AxiosError) => {
-    const data = error.response?.data as { detail?: string } | undefined;
-    if (data?.detail) {
-      return Promise.reject({ message: data.detail });
-    }
-    return Promise.reject(error);
-  }
-);
-
-const axiosConfig = {
-  timeout: 5000
+type PageCriteria = {
+  page?: number | undefined;
+  pageSize?: number | undefined;
 };
 
-function getConfig(accessToken: string = '') {
-  if (accessToken === '')
-    return {
-      timeout: 5000
-    };
-  else {
-    return {
-      timeout: 5000,
-      headers: { authorization: `Bearer ${accessToken}` }
-    };
-  }
+function withFieldMask<T extends Record<string, unknown>>(data: T) {
+  return { FieldMask: getFieldMask(data), ...data };
 }
 
-const requests = {
-  put: (url: string, body: any) =>
-    axios.put(url, body, axiosConfig).then(getRespBody),
-  patch: (url: string, body: any) =>
-    axios.patch(url, body, axiosConfig).then(getRespBody),
-
-  post: async (baseUrl: string, data: any) => {
-    const accessToken = await getAccessToken();
-    return axios
-      .post(baseUrl, { ...data }, getConfig(accessToken))
-      .then(getRespBody);
-  },
-
-  create: async (baseUrl: string, data: any) => {
-    const accessToken = await getAccessToken();
-    return axios
-      .post(baseUrl, { ...data }, getConfig(accessToken))
-      .then(getRespBody);
-  },
-
-  get: async (baseUrl: string) => {
-    const accessToken = await getAccessToken();
-    return axios.get(baseUrl, getConfig(accessToken)).then(getRespBody);
-  },
-
-  delete: async (url: string) => {
-    const accessToken = await getAccessToken();
-    return axios.delete(url, getConfig(accessToken)).then(getRespBody);
-  },
-
-  list: async (baseUrl: string, data: any) => {
-    const accessToken = await getAccessToken();
-    return axios
-      .get(baseUrl + createQueryString(data), getConfig(accessToken))
-      .then(getRespBody);
-  },
-  update: async (baseUrl: string, data: any) => {
-    const accessToken = await getAccessToken();
-    return axios
-      .patch(
-        baseUrl,
-        { FieldMask: getFieldMask(data), ...data },
-        getConfig(accessToken)
-      )
-      .then(getRespBody);
-  },
-  custom: async (baseUrl: string, data: any) => {
-    const accessToken = await getAccessToken();
-    return axios
-      .post(
-        baseUrl,
-        { FieldMask: getFieldMask(data), ...data },
-        getConfig(accessToken)
-      )
-      .then(getRespBody);
-  }
+export type IssueListCriteria = PageCriteria & {
+  projectId?: ProjectId | undefined;
+  id?: string | undefined;
+  createdBy?: string | undefined;
+  ownerId?: UserId | undefined;
+  type?: IssueType | undefined;
+  progress?: IssueProgress | undefined;
+  priority?: IssuePriority | undefined;
 };
 
-const User = {
-  update: async (data: any) => await requests.update(`user`, data),
-  list: async (data: any) => await requests.list(`user`, data),
-  createSafely: async (data: any) =>
-    await requests.custom(`user/:createUserSafely`, data)
+export type CreateIssueRequest = {
+  id: string;
+  projectId: ProjectId;
+  summary: string;
+  description: string;
+  type: IssueType;
+  progress: IssueProgress;
+  priority: IssuePriority;
+  responsibleBy: string[];
 };
 
-const Project = {
-  get: (id: string) => requests.get(`project/${id}`),
-  create: async (data: any) => await requests.create(`project`, data),
-  update: async (data: any) => await requests.update(`project`, data),
-  list: async (data: any) => await requests.list(`project`, data),
-  delete: async (id: string) => await requests.delete(`project/${id}`)
+export type UpdateIssueRequest = {
+  id: IssueId;
+  summary: string;
+  description: string;
+  type: IssueType;
+  progress: IssueProgress;
+  priority: IssuePriority;
+};
+
+export type KanbanPositionUpdate = {
+  issueId: IssueId;
+  kanbanRowPosition: number;
+  isPinnedToKanban: boolean;
+};
+
+export type UpdateKanbanRequest = {
+  issueId: IssueId;
+  progress: IssueProgress;
+  permissions: KanbanPositionUpdate[];
 };
 
 const Issue = {
-  create: async (data: any) => await requests.create(`issue`, data),
-  update: async (data: any) => await requests.update(`issue`, data),
-  getIssueKanban: async () =>
-    await requests.custom(`issue/:getIssueKanban`, {}),
-  updateIssueKanban: async (data: any) =>
-    await requests.custom(`issue/:updateIssueKanban`, data),
-  get: (id: string) => requests.get(`issue/${id}`),
-  list: async (data: any) => await requests.list(`issue`, data),
-  delete: async (id: string) => await requests.delete(`issue/${id}`)
+  get: (id: IssueId) => request.get(IssueSchema, `issue/${id}`),
+  list: (criteria: IssueListCriteria = {}) =>
+    request.get(IssueListSchema, 'issue', criteria),
+  create: (data: CreateIssueRequest) =>
+    request.post(IssueSchema, 'issue', data),
+  update: (data: UpdateIssueRequest) =>
+    request.patch(IssueSchema, 'issue', withFieldMask(data)),
+  delete: (id: IssueId) => request.remove(`issue/${id}`),
+  getKanban: () => request.post(KanbanCardsSchema, 'issue/:getIssueKanban', {}),
+  updateKanban: (data: UpdateKanbanRequest) =>
+    request.post(KanbanCardsSchema, 'issue/:updateIssueKanban', data)
+};
+
+export type ProjectListCriteria = PageCriteria & {
+  id?: string | undefined;
+  createdBy?: string | undefined;
+  progress?: ProjectProgress | undefined;
+};
+
+export type CreateProjectRequest = {
+  id: string;
+  summary: string;
+  description: string;
+  progress: ProjectProgress;
+};
+
+export type UpdateProjectRequest = {
+  id: ProjectId;
+  summary: string;
+  description: string;
+  progress: ProjectProgress;
+};
+
+const Project = {
+  get: (id: ProjectId) => request.get(ProjectSchema, `project/${id}`),
+  list: (criteria: ProjectListCriteria = {}) =>
+    request.get(ProjectListSchema, 'project', criteria),
+  create: (data: CreateProjectRequest) =>
+    request.post(ProjectSchema, 'project', data),
+  update: (data: UpdateProjectRequest) =>
+    request.patch(ProjectSchema, 'project', withFieldMask(data)),
+  delete: (id: ProjectId) => request.remove(`project/${id}`)
+};
+
+export type UserListCriteria = PageCriteria & {
+  id?: string | undefined;
+  email?: string | undefined;
+};
+
+export type UpdateUserRequest = {
+  id: UserId;
+  isActivated: boolean;
+};
+
+const User = {
+  list: (criteria: UserListCriteria = {}) =>
+    request.get(UserListSchema, 'user', criteria),
+  update: (data: UpdateUserRequest) =>
+    request.patch(UserSchema, 'user', withFieldMask(data)),
+  /** Idempotent server-side upsert; identity comes from the bearer token. */
+  createSafely: () => request.post(UserSchema, 'user/:createUserSafely', {})
+};
+
+export type PermissionListCriteria = PageCriteria & {
+  userId?: UserId | undefined;
+  issueId?: IssueId | undefined;
+};
+
+export type PermissionRequest = {
+  userId: UserId;
+  issueId: IssueId;
+  isPinnedToKanban: boolean;
+  issuePermission: IssuePermission;
 };
 
 const Permission = {
-  create: async (data: any) => await requests.create(`permission`, data),
-  update: async (data: any) => await requests.update(`permission`, data),
-  get: (userId: string, issueId: string) =>
-    requests.get(`permission/${userId}/${issueId}`),
-  list: async (data: any) => await requests.list(`permission`, data),
-  delete: async (userId: string, issueId: string) =>
-    await requests.delete(`permission/${userId}/${issueId}`)
+  get: (userId: UserId, issueId: IssueId) =>
+    request.get(PermissionSchema, `permission/${userId}/${issueId}`),
+  list: (criteria: PermissionListCriteria = {}) =>
+    request.get(PermissionListSchema, 'permission', criteria),
+  create: (data: PermissionRequest) =>
+    request.post(PermissionSchema, 'permission', data),
+  update: (data: PermissionRequest) =>
+    request.patch(PermissionSchema, 'permission', data),
+  delete: (userId: UserId, issueId: IssueId) =>
+    request.remove(`permission/${userId}/${issueId}`)
+};
+
+export type CommentListCriteria = PageCriteria & {
+  issueId?: IssueId | undefined;
+  content?: string | undefined;
+  createdBy?: string | undefined;
+};
+
+export type CreateCommentRequest = {
+  userId: UserId;
+  issueId: IssueId;
+  content: string;
+};
+
+export type UpdateCommentRequest = {
+  id: CommentId;
+  content: string;
 };
 
 const Comment = {
-  create: async (data: any) => await requests.create(`comment`, data),
-  update: async (data: any) => await requests.update(`comment`, data),
-  list: async (data: any) => await requests.list(`comment`, data),
-  delete: async (id: string) => await requests.delete(`comment/${id}`)
+  list: (criteria: CommentListCriteria = {}) =>
+    request.get(CommentListSchema, 'comment', criteria),
+  create: (data: CreateCommentRequest) =>
+    request.post(IssueCommentSchema, 'comment', data),
+  update: (data: UpdateCommentRequest) =>
+    request.patch(IssueCommentSchema, 'comment', data),
+  delete: (id: CommentId) => request.remove(`comment/${id}`)
 };
 
 export const adapter = {

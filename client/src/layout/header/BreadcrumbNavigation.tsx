@@ -1,36 +1,28 @@
 import { Typography } from '@mui/material';
-import Link, { LinkProps } from '@mui/material/Link';
 import Breadcrumbs from '@mui/material/Breadcrumbs';
+import Link, { type LinkProps } from '@mui/material/Link';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import { Link as RouterLink, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { pathToNameMap } from '@/consts/pathToNameMap';
+import { isRouteKey, usePathToNameMap } from '@/consts/pathToNameMap';
 
-interface LinkRouterProps extends LinkProps {
+type LinkRouterProps = LinkProps<typeof RouterLink> & {
   to: string;
   replace?: boolean;
-}
+};
 
 const LinkRouter = (props: LinkRouterProps) => (
-  <Link {...props} component={RouterLink as any} />
+  <Link {...props} component={RouterLink} />
 );
-
-const mapValues = (routes: string, map: any) => {
-  const clone: any = routes.split('/');
-  clone.forEach((k: string, index: number) => {
-    if (map[k]) {
-      clone[index] = map[k];
-    }
-  });
-  return clone;
-};
 
 const BreadcrumbNavigation = () => {
   const location = useLocation();
   const { t } = useTranslation();
-  const pathnames = location.pathname.split('/').filter((x) => x);
+  const names = usePathToNameMap();
 
-  const map = pathToNameMap();
+  const segments = location.pathname.split('/').filter(Boolean);
+  const label = (segment: string) =>
+    isRouteKey(segment) ? names[segment] : segment;
 
   return (
     <Breadcrumbs
@@ -40,17 +32,17 @@ const BreadcrumbNavigation = () => {
       <LinkRouter underline="hover" color="inherit" to="/">
         {t('routes.home')}
       </LinkRouter>
-      {pathnames.map((value, index) => {
-        const last = index === pathnames.length - 1;
-        const to = `/${pathnames.slice(0, index + 1).join('/')}`;
+      {segments.map((segment, index) => {
+        const to = `/${segments.slice(0, index + 1).join('/')}`;
+        const isLast = index === segments.length - 1;
 
-        return last ? (
+        return isLast ? (
           <Typography color="text.primary" key={to}>
-            {mapValues(value, map)}
+            {label(segment)}
           </Typography>
         ) : (
           <LinkRouter underline="hover" color="inherit" to={to} key={to}>
-            {mapValues(value, map)}
+            {label(segment)}
           </LinkRouter>
         );
       })}

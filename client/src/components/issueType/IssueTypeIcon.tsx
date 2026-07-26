@@ -1,15 +1,13 @@
-import { IssueType } from '@/models/issue/issueType';
-import issueTypeList from './issueType/issueTypeList';
+import type { IssueType } from '@/models/issue/issueType';
+import { issueTypeBadges } from './issueTypeBadges';
 
 interface Props {
-  value?: IssueType;
+  value: IssueType | undefined;
 }
-function IssueTypeIcon({ value }: Props): JSX.Element {
-  return (
-    issueTypeList(false).find((item: any) => item.value === value)?.icon ?? (
-      <div></div>
-    )
-  );
+
+function IssueTypeIcon({ value }: Props) {
+  if (value === undefined) return null;
+  return <>{issueTypeBadges[value].icon}</>;
 }
 
 export default IssueTypeIcon;

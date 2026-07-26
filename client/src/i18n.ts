@@ -3,20 +3,18 @@ import { initReactI18next } from 'react-i18next';
 import Backend from 'i18next-http-backend';
 import LanguageDetector from 'i18next-browser-languagedetector';
 
-const fallbackLng = ['en'];
-const availableLanguages = ['en'];
+const availableLanguages = ['en'] as const;
 
-i18n
+export type AvailableLanguage = (typeof availableLanguages)[number];
+
+void i18n
   .use(Backend)
   .use(LanguageDetector)
   .use(initReactI18next)
   .init({
-    fallbackLng,
-    detection: {
-      checkWhitelist: true
-    },
+    fallbackLng: [...availableLanguages],
+    supportedLngs: [...availableLanguages],
     debug: false,
-    whitelist: availableLanguages,
     interpolation: {
       escapeValue: false
     }

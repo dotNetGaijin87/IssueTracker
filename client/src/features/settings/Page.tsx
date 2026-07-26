@@ -38,7 +38,11 @@ function Settings({ darkMode, handleThemeChange }: Props) {
         <Typography color="text.secondary">
           {t('settings.theme.light')}
         </Typography>
-        <Switch color="primary" checked={darkMode} onChange={handleThemeChange} />
+        <Switch
+          color="primary"
+          checked={darkMode}
+          onChange={handleThemeChange}
+        />
         <Typography>{t('settings.theme.dark')}</Typography>
       </Stack>
     </Box>

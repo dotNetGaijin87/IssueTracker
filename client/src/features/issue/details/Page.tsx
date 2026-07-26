@@ -1,86 +1,64 @@
-import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useCallback, useState, type SyntheticEvent } from 'react';
 import { TabContext } from '@mui/lab';
 import { Tab } from '@mui/material';
+import { adapter } from '@/adapters/adapter';
+import { useAuth } from '@/authentication/Auth';
+import TabList from '@/components/tabList/TabList';
+import TabPanel from '@/components/tabPanel/TabPanel';
+import { useIssueId } from '@/helpers/routing/useRouteId';
+import { useAsyncResource } from '@/helpers/useAsyncResource';
 import LoadingPage from '@/layout/common/LoadingPage';
-import { Issue, IssueDefaultValue } from '@/models/issue/issue';
+import NotFound from '@/layout/common/NotFound';
+import { issueCapabilities } from '@/models/access';
+import type { Issue } from '@/models/issue/issue';
+import Assignees from './Assignees';
 import Comments from './Comments';
 import Summary from './Summary';
-import TabPanel from '@/components/tabPanel/TabPanel';
-import TabList from '@/components/tabList/TabList';
-import { adapter } from '@/adapters/adapter';
-import { IssuePermission } from '@/models/issue/issuePermission';
-import { useAuth } from '@/authentication/Auth';
-import { UserRole } from '@/models/user/userRole';
-import Assignees from './Assignees';
-import displayError from '@/helpers/errorHandling/displayError';
-import { Permission } from '@/models/permission/permission';
 
-function IssueDetailsPage(): JSX.Element {
+function IssueDetailsPage() {
   const { authUser } = useAuth();
-  const { issueId } = useParams<{ issueId: string }>();
-  const [issue, setIssue] = useState<Issue>(IssueDefaultValue);
-  const [loading, setLoading] = useState(false);
+  const issueId = useIssueId();
   const [tabId, setTabId] = useState('summary');
 
-  const [permission, setPermission] = useState<Permission>();
-
-  useEffect(() => {
-    const run = async () => {
-      try {
-        setLoading(true);
-        if (issueId) {
-          const issue = await adapter.Issue.get(issueId);
-          setIssue(issue);
-          setPermission(issue.permission);
-        }
-      } catch (ex) {
-        displayError(ex, 'Getting data error');
-      }
-      setLoading(false);
-    };
-
-    run();
+  const load = useCallback(() => {
+    if (issueId === undefined) return Promise.resolve(undefined);
+    return adapter.Issue.get(issueId);
   }, [issueId]);
 
-  const canDelete = () =>
-    permission?.issuePermission === IssuePermission.CanDelete ||
-    authUser?.role === UserRole.admin ||
-    authUser?.role === UserRole.manager ||
-    authUser?.name === issue.createdBy;
+  const { data: issue, loading } = useAsyncResource<Issue | undefined>(
+    load,
+    undefined,
+    'Getting data error'
+  );
 
-  const canModify = () =>
-    permission?.issuePermission === IssuePermission.CanDelete ||
-    permission?.issuePermission === IssuePermission.CanModify ||
-    authUser?.role === UserRole.admin ||
-    authUser?.role === UserRole.manager;
-
-  const permissions = [
-    canDelete() ? IssuePermission.CanDelete : IssuePermission.CanSee,
-    canModify() ? IssuePermission.CanModify : IssuePermission.CanSee
-  ];
+  const handleTabChange = (_event: SyntheticEvent, value: string) => {
+    setTabId(value);
+  };
 
   if (loading) return <LoadingPage />;
+  if (issue === undefined) return <NotFound />;
+
+  const capabilities = issueCapabilities({
+    permission: issue.permission?.issuePermission,
+    role: authUser?.role,
+    isOwner: authUser?.id !== undefined && authUser.id === issue.createdBy
+  });
 
   return (
     <TabContext value={tabId}>
-      <TabList
-        onChange={(event: any, newValue: string) => {
-          setTabId(newValue);
-        }}
-      >
+      <TabList onChange={handleTabChange}>
         <Tab value="summary" label="Summary" />
         <Tab value="comments" label="Comments" />
         <Tab value="assignees" label="Assignees" />
       </TabList>
-      <TabPanel value={'summary'}>
-        <Summary issue={issue} initialPermission={permission} />
+      <TabPanel value="summary">
+        <Summary issue={issue} capabilities={capabilities} />
       </TabPanel>
-      <TabPanel value={'comments'}>
-        <Comments permissions={permissions} />
+      <TabPanel value="comments">
+        <Comments capabilities={capabilities} />
       </TabPanel>
-      <TabPanel value={'assignees'}>
-        <Assignees issue={issue} permissions={permissions} />
+      <TabPanel value="assignees">
+        <Assignees issue={issue} capabilities={capabilities} />
       </TabPanel>
     </TabContext>
   );

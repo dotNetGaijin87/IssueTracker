@@ -1,13 +1,9 @@
-function extractUserId(user: string | undefined): string {
-  if (user === undefined) {
-    new Error('No UserId');
-  }
-  const userId = user?.split('|').pop();
+import { UserIdSchema, type UserId } from '@/models/ids';
 
-  if (userId === undefined) {
-    new Error('No UserId');
-  }
-  return userId!;
+/** Auth0 subjects look like `auth0|1a2b3c`; the API stores only the suffix. */
+function extractUserId(subject: string | undefined): UserId | undefined {
+  const result = UserIdSchema.safeParse(subject?.split('|').pop());
+  return result.success ? result.data : undefined;
 }
 
 export default extractUserId;

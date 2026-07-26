@@ -3,6 +3,9 @@ import App from './layout/app/App';
 import './index.css';
 
 const container = document.getElementById('root');
-const root = createRoot(container!);
 
-root.render(<App />);
+if (container === null) {
+  throw new Error('Missing #root element: index.html and index.tsx disagree.');
+}
+
+createRoot(container).render(<App />);

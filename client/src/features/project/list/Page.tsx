@@ -1,5 +1,4 @@
-import { Fragment, useEffect, useState } from 'react';
-import ActionBar from './ActionBar';
+import { useCallback, useState, type ChangeEvent } from 'react';
 import {
   Fade,
   IconButton,
@@ -9,60 +8,43 @@ import {
   TableHead,
   TableRow
 } from '@mui/material';
-import { adapter } from '@/adapters/adapter';
-import displayError from '@/helpers/errorHandling/displayError';
-import LoadingPage from '@/layout/common/LoadingPage';
-import { Project } from '@/models/project/project';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import { Link } from 'react-router-dom';
-import safelyConvertDateTime from '@/helpers/time/safelyConvertDateTime';
-import TableContainer from '@/components/tableContainer/TableContainer';
-import ProjectProgressBadge from '@/components/projectProgress/ProjectProgressBadge';
+import { adapter, type ProjectListCriteria } from '@/adapters/adapter';
 import Pagination from '@/components/pagination/Pagination';
+import ProjectProgressBadge from '@/components/projectProgress/ProjectProgressBadge';
+import TableContainer from '@/components/tableContainer/TableContainer';
+import safelyConvertDateTime from '@/helpers/time/safelyConvertDateTime';
+import { useAsyncResource } from '@/helpers/useAsyncResource';
+import LoadingPage from '@/layout/common/LoadingPage';
+import { emptyPage, type Paginated } from '@/models/pagination';
+import type { Project } from '@/models/project/project';
+import ActionBar from './ActionBar';
 
-interface ProjectList {
-  projects: Project[];
-  pageCount: number;
-  page: number;
-}
+const EMPTY: Paginated<Project> = emptyPage<Project>();
 
 function ProjectListPage() {
-  const [lodaing, setLoading] = useState(false);
-  const [searchCriteria, setSearchCriteria] = useState<any>();
-  const [projectList, setProjectList] = useState<ProjectList>({
-    projects: [],
-    pageCount: 0,
-    page: 1
-  });
+  const [criteria, setCriteria] = useState<ProjectListCriteria>({});
 
-  useEffect(() => {
-    const run = async () => {
-      try {
-        setLoading(true);
-        const projectList = (await adapter.Project.list(
-          searchCriteria
-        )) as ProjectList;
-        setProjectList(projectList);
-      } catch (ex) {
-        displayError(ex, 'Loading projects failed');
-      }
-      setLoading(false);
-    };
+  const load = useCallback(() => adapter.Project.list(criteria), [criteria]);
 
-    run();
-  }, [searchCriteria]);
+  const { data, loading } = useAsyncResource(
+    load,
+    EMPTY,
+    'Loading projects failed'
+  );
 
-  const handleSearchReq = (value: object) => {
-    setSearchCriteria(value);
-  };
-  const handlePaginationChange = (event: any, page: number) => {
-    setSearchCriteria({ ...searchCriteria, page: page });
+  const handlePaginationChange = (
+    _event: ChangeEvent<unknown>,
+    page: number
+  ) => {
+    setCriteria((current) => ({ ...current, page }));
   };
 
   return (
-    <Fragment>
-      <ActionBar onSearch={handleSearchReq} />
-      {lodaing ? (
+    <>
+      <ActionBar onSearch={setCriteria} />
+      {loading ? (
         <LoadingPage />
       ) : (
         <>
@@ -81,7 +63,7 @@ function ProjectListPage() {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {projectList.projects?.map((project: Project) => (
+                  {data.items.map((project) => (
                     <TableRow key={project.id}>
                       <TableCell>
                         <IconButton
@@ -110,13 +92,13 @@ function ProjectListPage() {
             </Fade>
           </TableContainer>
           <Pagination
-            pageCount={projectList.pageCount}
-            page={projectList.page}
+            pageCount={data.pageCount}
+            page={data.page}
             onChange={handlePaginationChange}
           />
         </>
       )}
-    </Fragment>
+    </>
   );
 }
 

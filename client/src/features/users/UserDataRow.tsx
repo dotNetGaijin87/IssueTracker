@@ -1,14 +1,14 @@
+import { useState } from 'react';
 import { TableCell, TableRow, ToggleButton } from '@mui/material';
-import { useAuth } from '@/authentication/Auth';
-import safelyConvertDateTime from '@/helpers/time/safelyConvertDateTime';
-import { User } from '@/models/user/user';
-import { UserRole } from '@/models/user/userRole';
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
-import React from 'react';
-import { adapter } from '@/adapters/adapter';
-import displayError from '@/helpers/errorHandling/displayError';
 import { toast } from 'react-toastify';
+import { adapter } from '@/adapters/adapter';
+import { useAuth } from '@/authentication/Auth';
+import displayError from '@/helpers/errorHandling/displayError';
+import safelyConvertDateTime from '@/helpers/time/safelyConvertDateTime';
+import type { User } from '@/models/user/user';
+import { UserRole } from '@/models/user/userRole';
 
 interface Props {
   user: User;
@@ -16,33 +16,36 @@ interface Props {
 
 function UserDataRow({ user }: Props) {
   const { authUser } = useAuth();
-  const [userActivated, setUserActivated] = React.useState<boolean>(
-    user.isActivated
-  );
+  const [activated, setActivated] = useState(user.isActivated);
+  const isAdmin = authUser?.role === UserRole.admin;
 
-  const handleChangeUserActivationStatus = async () => {
+  const handleActivationToggle = async () => {
+    const next = !activated;
+
     try {
-      await adapter.User.update({ isActivated: !userActivated, Id: user.id });
-      !userActivated
-        ? toast.success('User account activated')
-        : toast.success('User account deactivated');
-      setUserActivated(!userActivated);
-    } catch (ex) {
-      displayError(ex, 'Saving data error');
+      await adapter.User.update({ id: user.id, isActivated: next });
+      setActivated(next);
+      toast.success(
+        next ? 'User account activated' : 'User account deactivated'
+      );
+    } catch (error) {
+      displayError(error, 'Saving data error');
     }
   };
 
   return (
-    <TableRow key={user.id}>
-      {authUser?.role === UserRole.admin && (
+    <TableRow>
+      {isAdmin && (
         <TableCell>
           <ToggleButton
             value="check"
             size="small"
-            selected={userActivated}
-            onChange={handleChangeUserActivationStatus}
+            selected={activated}
+            onChange={() => {
+              void handleActivationToggle();
+            }}
           >
-            {userActivated ? <CheckIcon /> : <CloseIcon />}
+            {activated ? <CheckIcon /> : <CloseIcon />}
           </ToggleButton>
         </TableCell>
       )}
@@ -50,7 +53,7 @@ function UserDataRow({ user }: Props) {
       <TableCell>{user.id}</TableCell>
       <TableCell>{user.email}</TableCell>
       <TableCell>{user.role}</TableCell>
-      {authUser?.role === UserRole.admin && (
+      {isAdmin && (
         <>
           <TableCell>{safelyConvertDateTime(user.registeredOn)}</TableCell>
           <TableCell>{safelyConvertDateTime(user.lastLoggedOn)}</TableCell>

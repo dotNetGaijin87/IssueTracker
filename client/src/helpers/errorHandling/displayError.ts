@@ -1,11 +1,8 @@
 import { toast } from 'react-toastify';
+import { errorMessage } from '@/adapters/apiError';
 
-function displayError(exception: any, fallbackMessage: string) {
-  if (exception?.message) {
-    toast.error(exception?.message);
-  } else {
-    toast.error(fallbackMessage);
-  }
+function displayError(error: unknown, fallbackMessage: string): void {
+  toast.error(errorMessage(error, fallbackMessage));
 }
 
 export default displayError;

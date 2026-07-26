@@ -1,184 +1,204 @@
-import * as React from 'react';
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type HTMLAttributes,
+  type Key
+} from 'react';
 import {
   Autocomplete as MuiAutocomplete,
   Avatar,
   AvatarGroup,
   Checkbox,
   Chip,
-  TextField,
   CircularProgress,
   InputAdornment,
-  MenuItem
+  TextField,
+  type TextFieldProps
 } from '@mui/material';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckIcon from '@mui/icons-material/Check';
 import { adapter } from '@/adapters/adapter';
 import delayExec from '@/helpers/delayExec';
+import displayError from '@/helpers/errorHandling/displayError';
+import type { IssueId, UserId } from '@/models/ids';
 import { IssuePermission } from '@/models/issue/issuePermission';
 
-const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
-const checkedIcon = <CheckIcon fontSize="small" />;
+const SEARCH_DEBOUNCE_MS = 1500;
+const AVATAR_INITIALS = 2;
+
+const unchecked = <CheckBoxOutlineBlankIcon fontSize="small" />;
+const checked = <CheckIcon fontSize="small" />;
+
+type OptionProps = HTMLAttributes<HTMLLIElement> & { key?: Key };
 
 interface Props {
-  issueId?: string;
+  issueId?: IssueId | undefined;
   disabled?: boolean;
-  onChange: (selected: string[]) => void;
+  onChange?: (selected: UserId[]) => void;
 }
 
-export default function AssigneesSetter({
-  issueId,
-  disabled,
-  onChange
-}: Props) {
-  const [open, setOpen] = React.useState(false);
-  const [search, setSearch] = React.useState('');
-  const [options, setOptions] = React.useState<string[]>([]);
-  const [usersWithPermissions, setUsersWithPermissions] = React.useState<
-    string[]
-  >([]);
-  const [loading, setLoading] = React.useState(false);
-  const isNewIssue = !issueId;
+function AssigneesSetter({ issueId, disabled = false, onChange }: Props) {
+  const [open, setOpen] = useState(false);
+  const [search, setSearch] = useState('');
+  const [options, setOptions] = useState<UserId[]>([]);
+  const [assignees, setAssignees] = useState<UserId[]>([]);
+  const [loading, setLoading] = useState(false);
 
-  React.useEffect(() => {
-    return delayExec(async () => {
+  const onChangeRef = useRef(onChange);
+  onChangeRef.current = onChange;
+
+  const publish = useCallback((selected: UserId[]) => {
+    setAssignees(selected);
+    onChangeRef.current?.(selected);
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadCandidates = async () => {
       setLoading(true);
-      let allUsers: string[] = [];
-      let usersWithPermissions: string[] = [];
-      let searchedUsers: string[] = [];
-      if (!isNewIssue) {
-        const userPermissionList = await adapter.Permission.list({ issueId });
-        usersWithPermissions = userPermissionList.permissions.map(
-          (x: any) => x.userId
-        );
+      try {
+        const assigned =
+          issueId === undefined
+            ? []
+            : (await adapter.Permission.list({ issueId })).items.map(
+                (permission) => permission.userId
+              );
+
+        const searched = disabled
+          ? []
+          : (await adapter.User.list({ id: search })).items.map(
+              (user) => user.id
+            );
+
+        if (cancelled) return;
+
+        setOptions([
+          ...assigned,
+          ...searched.filter((user) => !assigned.includes(user))
+        ]);
+        publish(assigned);
+      } catch (error) {
+        if (!cancelled) displayError(error, 'Loading assignees failed');
+      } finally {
+        if (!cancelled) setLoading(false);
       }
-      if (!disabled) {
-        searchedUsers = (await adapter.User.list({ id: search })).users.map(
-          (x: any) => x.id
-        );
-      }
+    };
 
-      allUsers = usersWithPermissions.concat(
-        searchedUsers.filter(
-          (item: string) => usersWithPermissions.indexOf(item) < 0
-        )
-      );
+    const cancelTimer = delayExec(() => {
+      void loadCandidates();
+    }, SEARCH_DEBOUNCE_MS);
 
-      setOptions(allUsers);
-      setUsersWithPermissions(usersWithPermissions);
-      onChange(usersWithPermissions);
-      setLoading(false);
-    }, 1500);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [issueId, search]);
+    return () => {
+      cancelled = true;
+      cancelTimer();
+    };
+  }, [issueId, search, disabled, publish]);
 
-  const updateUserIssueRelationship = async (
-    e: any,
-    option: any,
-    reason: any
-  ) => {
-    if (reason === 'selectOption') {
-      if (!isNewIssue) {
+  const handleAssigneesChange = async (selected: readonly UserId[]) => {
+    const next = [...selected];
+
+    try {
+      const added = next.find((user) => !assignees.includes(user));
+      const removed = assignees.find((user) => !next.includes(user));
+
+      if (issueId !== undefined && added !== undefined) {
         await adapter.Permission.create({
-          issueId: issueId,
-          userId: option[option.length - 1],
+          issueId,
+          userId: added,
           issuePermission: IssuePermission.CanModify,
           isPinnedToKanban: true
         });
       }
-      const newUsersWithClaim = [
-        ...usersWithPermissions,
-        option[option.length - 1]
-      ];
-      setUsersWithPermissions(newUsersWithClaim);
-      onChange(newUsersWithClaim);
-    } else if (reason === 'removeOption') {
-      const removedUser = usersWithPermissions.filter(
-        (x) => !option.includes(x)
-      )[0];
-      if (!isNewIssue) {
-        await adapter.Permission.delete(removedUser, issueId!);
+
+      if (issueId !== undefined && removed !== undefined) {
+        await adapter.Permission.delete(removed, issueId);
       }
-      setUsersWithPermissions(option);
-      onChange(option);
+
+      publish(next);
+    } catch (error) {
+      displayError(error, 'Updating assignees failed');
     }
   };
 
-  return loading ? (
-    <TextField
-      sx={{ m: '8px 8px', width: 'inherit' }}
-      size="small"
-      InputProps={{
-        startAdornment: (
-          <InputAdornment position="start">
-            <CircularProgress size="24px" />
-          </InputAdornment>
-        )
-      }}
-    />
-  ) : (
+  if (loading) {
+    return (
+      <TextField
+        sx={{ m: '8px 8px', width: 'inherit' }}
+        size="small"
+        InputProps={{
+          startAdornment: (
+            <InputAdornment position="start">
+              <CircularProgress size="24px" />
+            </InputAdornment>
+          )
+        }}
+      />
+    );
+  }
+
+  return (
     <MuiAutocomplete
       sx={{ m: '8px 8px', width: 'inherit' }}
       multiple
       disableCloseOnSelect
       open={open}
-      value={usersWithPermissions}
-      onChange={(value, option, reason) => {
-        if (!disabled) {
-          updateUserIssueRelationship(value, option, reason);
-        }
-      }}
+      value={assignees}
+      options={options}
       onOpen={() => {
         setOpen(true);
       }}
       onClose={() => {
         setOpen(false);
       }}
+      onChange={(_event, selected) => {
+        if (!disabled) void handleAssigneesChange(selected);
+      }}
       getOptionLabel={(option) => option}
-      options={options}
-      popupIcon={<></>}
-      clearIcon={<></>}
-      renderTags={(value, getTagProps) => (
-        <AvatarGroup max={3} {...getTagProps}>
+      popupIcon={null}
+      clearIcon={null}
+      renderTags={(value) => (
+        <AvatarGroup max={3}>
           {value.map((option) => (
             <Avatar key={option} sx={{ width: '24px', height: '24px' }}>
-              {option.substring(0, 2)}
+              {option.substring(0, AVATAR_INITIALS)}
             </Avatar>
           ))}
         </AvatarGroup>
       )}
       renderOption={(props, option, { selected }) => {
-        const { key, ...optionProps } = props;
+        // MUI types this parameter's `key` as `any`; the assertion narrows it.
+        const { key, ...optionProps } = props as OptionProps;
         return (
-        <MenuItem key={key} {...optionProps} sx={{ m: 0, p: 0 }}>
-          <>
+          <li key={key} {...optionProps} style={{ margin: 0, padding: 0 }}>
             <Checkbox
-              icon={icon}
-              checkedIcon={checkedIcon}
+              icon={unchecked}
+              checkedIcon={checked}
               checked={selected}
             />
             <Chip
               size="small"
               label={option}
-              avatar={<Avatar>{option.substring(0, 2)}</Avatar>}
+              avatar={<Avatar>{option.substring(0, AVATAR_INITIALS)}</Avatar>}
             />
-          </>
-        </MenuItem>
+          </li>
         );
       }}
       renderInput={(params) => (
         <TextField
+          {...(params as TextFieldProps)}
           sx={{ margin: 0, width: 'inherit' }}
-          {...params}
-          InputProps={{
-            ...params.InputProps
-          }}
           disabled={disabled}
           size="small"
-          onChange={(e) => {
-            setSearch(e.target.value);
+          onChange={(event) => {
+            setSearch(event.target.value);
           }}
         />
       )}
     />
   );
 }
+
+export default AssigneesSetter;

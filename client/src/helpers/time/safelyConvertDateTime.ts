@@ -1,5 +1,8 @@
 function safelyConvertDateTime(date: Date | null | undefined): string {
-  return date ? new Date(date).toLocaleString() : '';
+  if (!date) return '';
+
+  const value = new Date(date);
+  return Number.isNaN(value.getTime()) ? '' : value.toLocaleString();
 }
 
 export default safelyConvertDateTime;

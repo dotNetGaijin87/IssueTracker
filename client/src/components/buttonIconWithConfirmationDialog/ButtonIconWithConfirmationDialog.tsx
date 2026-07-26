@@ -7,7 +7,7 @@ interface Props {
   hoverOverTitle: string;
   dialogText: string;
   icon: JSX.Element;
-  onConfirm: () => void;
+  onConfirm: () => void | Promise<void>;
 }
 
 function ButtonIconWithConfirmationDialog({
@@ -51,7 +51,9 @@ function ButtonIconWithConfirmationDialog({
             variant="text"
             color="secondary"
             loading={processing}
-            onClick={handleConfirm}
+            onClick={() => {
+              void handleConfirm();
+            }}
           >
             OK
           </LoadingButton>

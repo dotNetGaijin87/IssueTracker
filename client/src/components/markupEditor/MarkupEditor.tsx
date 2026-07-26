@@ -7,16 +7,24 @@ interface Props {
   value: string;
   disabled?: boolean;
   onBlur: () => void;
-  onChange: () => void;
+  onChange: (value: string) => void;
 }
 
-function MarkupEditor({ title, value, disabled, onBlur, onChange }: Props) {
+function MarkupEditor({
+  title,
+  value,
+  disabled = false,
+  onBlur,
+  onChange
+}: Props) {
+  const editorProps = {
+    value,
+    onBlur,
+    previewOptions: { rehypePlugins: [[rehypeSanitize]] }
+  };
+
   return (
-    <Box
-      sx={{
-        p: 1
-      }}
-    >
+    <Box sx={{ p: 1 }}>
       <Typography sx={{ mb: 1 }}>{title}</Typography>
       <Box
         className="wmde-markdown-var"
@@ -34,21 +42,14 @@ function MarkupEditor({ title, value, disabled, onBlur, onChange }: Props) {
         data-color-mode="dark"
       >
         <Box sx={{ flexGrow: 1 }}>
+          {/* Omitting `onChange` entirely is what makes the editor read-only. */}
           {disabled ? (
-            <MDEditor
-              value={value}
-              onBlur={onBlur}
-              previewOptions={{
-                rehypePlugins: [[rehypeSanitize]]
-              }}
-            />
+            <MDEditor {...editorProps} />
           ) : (
             <MDEditor
-              value={value}
-              onBlur={onBlur}
-              onChange={onChange}
-              previewOptions={{
-                rehypePlugins: [[rehypeSanitize]]
+              {...editorProps}
+              onChange={(next) => {
+                onChange(next ?? '');
               }}
             />
           )}

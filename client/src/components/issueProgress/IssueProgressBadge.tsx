@@ -1,14 +1,11 @@
-import { IssueProgress } from '@/models/issue/issueProgress';
-import issueProgressList from './issueProgress/issueProgressList';
+import StatusBadge, {
+  type BoundStatusBadgeProps
+} from '@/components/status/StatusBadge';
+import type { IssueProgress } from '@/models/issue/issueProgress';
+import { issueProgressBadges } from './issueProgressBadges';
 
-interface Props {
-  value?: IssueProgress;
-}
-function IssueProgressBadge({ value }: Props): JSX.Element {
-  return (
-    issueProgressList(false).find((item: any) => item.value === value)
-      ?.element ?? <div></div>
-  );
+function IssueProgressBadge(props: BoundStatusBadgeProps<IssueProgress>) {
+  return <StatusBadge {...props} registry={issueProgressBadges} />;
 }
 
 export default IssueProgressBadge;

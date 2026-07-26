@@ -95,8 +95,8 @@ which is preferred for anything sensitive.
 ```bash
 cd client
 cp .env.example .env   # API URL + Auth0 settings (see .env.example)
-npm install
-npm run dev
+pnpm install
+pnpm dev
 ```
 
 The app starts on http://localhost:3000 and talks to the backend API.
@@ -130,7 +130,7 @@ and **automatically creates and seeds the database** with demo data on startup. 
 Stop and remove everything with `docker compose down` (add `-v` to also drop the database volume).
 
 > **Behind a corporate proxy?** If the image build fails with TLS / certificate errors during
-> `dotnet restore` or `npm install` (e.g. NuGet `NU1301`), your network is intercepting TLS and the
+> `dotnet restore` or `pnpm install` (e.g. NuGet `NU1301`), your network is intercepting TLS and the
 > build containers don't trust its root CA. Build on a normal network, or add the proxy's CA to the
 > build images.
 
@@ -149,7 +149,15 @@ Integration tests spin up the API in-memory via `WebApplicationFactory` and requ
 dotnet test server/tests/IntegrationTests/IssueTracker.IntegrationTests
 ```
 
-The backend build + unit tests and the frontend build run automatically on every push via [GitHub Actions](./.github/workflows/ci.yml).
+Frontend unit tests run on Vitest and need no external services:
+
+```bash
+cd client
+pnpm test
+```
+
+On every push, [GitHub Actions](./.github/workflows/ci.yml) runs the backend build and unit
+tests, and the frontend type-check, lint, format check, unit tests and production build.
 
 ## License
 

@@ -1,23 +1,20 @@
 import AssigneesSetter from '@/components/assigneesSetter/AssigneesSetter';
 import Panel from '@/components/panel/Panel';
-import { Issue } from '@/models/issue/issue';
-import { IssuePermission } from '@/models/issue/issuePermission';
+import type { Capabilities } from '@/models/access';
+import type { Issue } from '@/models/issue/issue';
 
 interface Props {
-  issue: Issue | undefined;
-  permissions: IssuePermission[];
+  issue: Issue;
+  capabilities: Capabilities;
 }
 
-function Assignees({ issue, permissions }: Props) {
-  const canModifyPermission = permissions.includes(IssuePermission.CanModify);
-
+function Assignees({ issue, capabilities }: Props) {
   return (
     <Panel>
       <div style={{ width: '40%' }}>
         <AssigneesSetter
-          issueId={issue?.id}
-          disabled={!canModifyPermission}
-          onChange={() => {}}
+          issueId={issue.id}
+          disabled={!capabilities.canModify}
         />
       </div>
     </Panel>

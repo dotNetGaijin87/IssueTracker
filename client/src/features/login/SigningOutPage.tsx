@@ -1,9 +1,13 @@
+import { useEffect } from 'react';
 import { useAuth } from '@/authentication/Auth';
 import LoadingPage from '@/layout/common/LoadingPage';
 
 function SigningOutPage() {
   const { signOut } = useAuth();
-  signOut();
+
+  useEffect(() => {
+    signOut();
+  }, [signOut]);
 
   return <LoadingPage />;
 }

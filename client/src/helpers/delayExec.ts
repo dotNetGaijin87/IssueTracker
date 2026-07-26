@@ -1,6 +1,9 @@
-function delayExec(fun: () => void, delayTime: number) {
-  const timeOutId = setTimeout(() => fun(), delayTime);
-  return () => clearTimeout(timeOutId);
+/** Runs `action` after `delayMs` and returns a cancel function for cleanup. */
+function delayExec(action: () => void, delayMs: number): () => void {
+  const timeoutId = setTimeout(action, delayMs);
+  return () => {
+    clearTimeout(timeoutId);
+  };
 }
 
 export default delayExec;

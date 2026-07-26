@@ -1,16 +1,15 @@
+import type { ReactNode, SyntheticEvent } from 'react';
 import { TabList as MuiTabList } from '@mui/lab';
 
 interface Props {
-  children: React.ReactNode;
-  onChange: (event: any, newValue: string) => void;
+  children: ReactNode;
+  onChange: (event: SyntheticEvent, value: string) => void;
 }
 
 function TabList({ onChange, children }: Props) {
   return (
     <MuiTabList
-      onChange={(event: any, newValue: string) => {
-        onChange(event, newValue);
-      }}
+      onChange={onChange}
       textColor="secondary"
       sx={{
         ml: '20px',
@@ -23,11 +22,7 @@ function TabList({ onChange, children }: Props) {
         borderWidth: '1px',
         borderStyle: 'inset'
       }}
-      TabIndicatorProps={{
-        style: {
-          display: 'none'
-        }
-      }}
+      TabIndicatorProps={{ style: { display: 'none' } }}
     >
       {children}
     </MuiTabList>

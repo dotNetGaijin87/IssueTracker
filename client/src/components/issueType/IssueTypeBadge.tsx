@@ -1,15 +1,11 @@
-import { IssueType } from '@/models/issue/issueType';
-import issueTypeList from './issueType/issueTypeList';
+import StatusBadge, {
+  type BoundStatusBadgeProps
+} from '@/components/status/StatusBadge';
+import type { IssueType } from '@/models/issue/issueType';
+import { issueTypeBadges } from './issueTypeBadges';
 
-interface Props {
-  value?: IssueType;
-  unstyled?: boolean;
-}
-function IssueTypeBadge({ value, unstyled }: Props): JSX.Element {
-  return (
-    issueTypeList(unstyled).find((item: any) => item.value === value)
-      ?.element ?? <div></div>
-  );
+function IssueTypeBadge(props: BoundStatusBadgeProps<IssueType>) {
+  return <StatusBadge {...props} registry={issueTypeBadges} />;
 }
 
 export default IssueTypeBadge;
