@@ -9,5 +9,7 @@
 *.json
 !/client/package.json
 !/client/tsconfig.json
+!/client/tsconfig.app.json
+!/client/tsconfig.node.json
 !/client/public/locales/en/translation.json
 /heroku.yml
