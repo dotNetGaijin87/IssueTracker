@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useCallback, useState, type ChangeEvent } from 'react';
 import {
   Fade,
   IconButton,
@@ -8,69 +8,56 @@ import {
   TableHead,
   TableRow
 } from '@mui/material';
-import { adapter } from '@/adapters/adapter';
-import displayError from '@/helpers/errorHandling/displayError';
-import LoadingPage from '@/layout/common/LoadingPage';
-import { Issue } from '@/models/issue/issue';
-import TableContainer from '@/components/tableContainer/TableContainer';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
-import { Link, useParams } from 'react-router-dom';
-import safelyConvertDateTime from '@/helpers/time/safelyConvertDateTime';
-import Pagination from '@/components/pagination/Pagination';
-import IssueTypeBadge from '@/components/issueType/IssueTypeBadge';
-import IssueProgressBadge from '@/components/issueProgress/IssueProgressBadge';
+import { Link } from 'react-router-dom';
+import { adapter, type IssueListCriteria } from '@/adapters/adapter';
 import IssuePriorityBadge from '@/components/issuePriority/IssuePriorityBadge';
-import ActionBar, { IssueListSearchCriteria } from './ActionBar';
+import IssueProgressBadge from '@/components/issueProgress/IssueProgressBadge';
+import IssueTypeBadge from '@/components/issueType/IssueTypeBadge';
+import Pagination from '@/components/pagination/Pagination';
+import TableContainer from '@/components/tableContainer/TableContainer';
+import { useProjectId } from '@/helpers/routing/useRouteId';
+import safelyConvertDateTime from '@/helpers/time/safelyConvertDateTime';
+import { useAsyncResource } from '@/helpers/useAsyncResource';
+import LoadingPage from '@/layout/common/LoadingPage';
+import type { Issue } from '@/models/issue/issue';
+import { emptyPage, type Paginated } from '@/models/pagination';
+import ActionBar from './ActionBar';
 
-interface IssueList {
-  issues: Issue[];
-  pageCount: number;
-  page: number;
+const MAX_SUMMARY_LENGTH = 30;
+
+const EMPTY: Paginated<Issue> = emptyPage<Issue>();
+
+function truncate(value: string, maxLength: number): string {
+  return value.length > maxLength ? `${value.slice(0, maxLength)}...` : value;
 }
 
 function IssuesListPage() {
-  const { projectId } = useParams<{ projectId: string }>();
-  const [lodaing, setLoading] = React.useState(false);
-  const [searchCriteria, setSearchCriteria] = useState<any>();
-  const [state, setState] = useState<IssueList>({
-    issues: [],
-    pageCount: 0,
-    page: 1
-  });
+  const projectId = useProjectId();
+  const [criteria, setCriteria] = useState<IssueListCriteria>({});
 
-  useEffect(() => {
-    const run = async () => {
-      try {
-        setLoading(true);
-        const rsp = await adapter.Issue.list({
-          ...searchCriteria,
-          projectId: projectId
-        });
-        setState(rsp);
-      } catch (ex) {
-        displayError(ex, 'Loading issues failed');
-      }
-      setLoading(false);
-    };
+  const load = useCallback(
+    () => adapter.Issue.list({ ...criteria, projectId }),
+    [criteria, projectId]
+  );
 
-    run();
-  }, [searchCriteria, projectId]);
+  const { data, loading } = useAsyncResource(
+    load,
+    EMPTY,
+    'Loading issues failed'
+  );
 
   const handlePaginationChange = (
-    event: React.ChangeEvent<unknown>,
+    _event: ChangeEvent<unknown>,
     page: number
   ) => {
-    setSearchCriteria({ ...searchCriteria, page: page });
-  };
-
-  const handleSearchReq = (value: IssueListSearchCriteria) => {
-    setSearchCriteria(value);
+    setCriteria((current) => ({ ...current, page }));
   };
 
   return (
     <>
-      <ActionBar onSearch={handleSearchReq} />
-      {lodaing ? (
+      <ActionBar onSearch={setCriteria} />
+      {loading ? (
         <LoadingPage />
       ) : (
         <>
@@ -91,12 +78,12 @@ function IssuesListPage() {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {state.issues?.map((issue: Issue) => (
+                  {data.items.map((issue) => (
                     <TableRow key={issue.id}>
                       <TableCell>
                         <IconButton
                           component={Link}
-                          to={`/projects/${projectId}/issues/${issue.id}`}
+                          to={`/projects/${issue.projectId}/issues/${issue.id}`}
                         >
                           <ArrowRightIcon />
                         </IconButton>
@@ -106,15 +93,13 @@ function IssuesListPage() {
                         <IssuePriorityBadge value={issue.priority} />
                       </TableCell>
                       <TableCell>
-                        <IssueTypeBadge value={issue.type} unstyled={true} />
+                        <IssueTypeBadge value={issue.type} variant="plain" />
                       </TableCell>
                       <TableCell>
                         <IssueProgressBadge value={issue.progress} />
                       </TableCell>
                       <TableCell>
-                        {issue.summary.length > 30
-                          ? issue.summary.substring(0, 30) + '...'
-                          : issue.summary}
+                        {truncate(issue.summary, MAX_SUMMARY_LENGTH)}
                       </TableCell>
                       <TableCell>{issue.createdBy}</TableCell>
                       <TableCell>
@@ -130,8 +115,8 @@ function IssuesListPage() {
             </Fade>
           </TableContainer>
           <Pagination
-            pageCount={state.pageCount}
-            page={state.page}
+            pageCount={data.pageCount}
+            page={data.page}
             onChange={handlePaginationChange}
           />
         </>

@@ -1,56 +1,42 @@
-import { useEffect, useState } from 'react';
-import { adapter } from '@/adapters/adapter';
-import { User } from '@/models/user/user';
-import UsersTable from './UsersTable';
-import UsersSearch from './ActionBar';
-import React from 'react';
-import LoadingPage from '@/layout/common/LoadingPage';
+import { useCallback, useState, type ChangeEvent } from 'react';
+import { adapter, type UserListCriteria } from '@/adapters/adapter';
 import Pagination from '@/components/pagination/Pagination';
-import displayError from '@/helpers/errorHandling/displayError';
+import { useAsyncResource } from '@/helpers/useAsyncResource';
+import LoadingPage from '@/layout/common/LoadingPage';
+import { emptyPage, type Paginated } from '@/models/pagination';
+import type { User } from '@/models/user/user';
+import UsersSearch from './ActionBar';
+import UsersTable from './UsersTable';
+
+const EMPTY: Paginated<User> = emptyPage<User>();
 
 function UsersPage() {
-  const [lodaing, setLoading] = React.useState(false);
-  const [users, setUsers] = React.useState<User[]>([]);
-  const [pageCount, setPageCount] = React.useState(1);
-  const [page, setPage] = React.useState(1);
-  const [searchCriteria, setSearchCriteria] = useState<any>();
+  const [criteria, setCriteria] = useState<UserListCriteria>({});
 
-  useEffect(() => {
-    const run = async () => {
-      try {
-        setLoading(true);
-        const resp = await adapter.User.list(searchCriteria);
-        setUsers(resp.users);
-        setPageCount(resp.pageCount);
-        setPage(resp.page);
-      } catch (ex) {
-        displayError(ex, 'Fetching data error');
-      }
-      setLoading(false);
-    };
+  const load = useCallback(() => adapter.User.list(criteria), [criteria]);
 
-    run();
-  }, [searchCriteria]);
+  const { data, loading } = useAsyncResource(
+    load,
+    EMPTY,
+    'Fetching data error'
+  );
 
-  const handleSearchButtonClicked = (value: object) => {
-    setSearchCriteria(value);
-  };
   const handlePaginationChange = (
-    event: React.ChangeEvent<unknown>,
+    _event: ChangeEvent<unknown>,
     page: number
   ) => {
-    setSearchCriteria({ ...searchCriteria, page: page });
+    setCriteria((current) => ({ ...current, page }));
   };
 
-  if (lodaing) return <LoadingPage />;
+  if (loading) return <LoadingPage />;
 
   return (
     <>
-      <UsersSearch onSearchClicked={handleSearchButtonClicked} />
-      <UsersTable users={users} />
+      <UsersSearch onSearch={setCriteria} />
+      <UsersTable users={data.items} />
       <Pagination
-        pageCount={pageCount}
-        page={page}
+        pageCount={data.pageCount}
+        page={data.page}
         onChange={handlePaginationChange}
       />
     </>

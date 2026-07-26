@@ -1,67 +1,42 @@
-import React, { useEffect, useState } from 'react';
+import { useCallback, useState, type ChangeEvent } from 'react';
 import { Box } from '@mui/material';
-import { useParams } from 'react-router-dom';
-import Pagination from '@/components/pagination/Pagination';
-import Comment from '@/components/comment/Comment';
-import { IssuePermission } from '@/models/issue/issuePermission';
-import { IssueComment } from '@/models/comment/issueComment';
 import { adapter } from '@/adapters/adapter';
-import LoadingPage from '@/layout/common/LoadingPage';
 import AddComment from '@/components/addComment/AddComment';
-import displayError from '@/helpers/errorHandling/displayError';
+import Comment from '@/components/comment/Comment';
+import Pagination from '@/components/pagination/Pagination';
+import { useIssueId } from '@/helpers/routing/useRouteId';
+import { useAsyncResource } from '@/helpers/useAsyncResource';
+import LoadingPage from '@/layout/common/LoadingPage';
+import type { Capabilities } from '@/models/access';
+import type { IssueComment } from '@/models/comment/issueComment';
+import { emptyPage, type Paginated } from '@/models/pagination';
+
+const EMPTY: Paginated<IssueComment> = emptyPage<IssueComment>();
 
 interface Props {
-  permissions: IssuePermission[];
+  capabilities: Capabilities;
 }
 
-function IssueDetailsComments({ permissions }: Props) {
-  const { issueId } = useParams<{ issueId: string }>();
-  const [loading, setLoading] = React.useState(false);
-  const [comments, setComments] = React.useState<IssueComment[]>([]);
-  const [page, setPage] = React.useState(1);
-  const [pageCount, setPageCount] = React.useState(1);
-  const [searchCriteria, setSearchCriteria] = useState<any>({
-    IssueId: issueId
-  });
-  const canModifyPermission = permissions.includes(IssuePermission.CanModify);
+function IssueDetailsComments({ capabilities }: Props) {
+  const issueId = useIssueId();
+  const [page, setPage] = useState(1);
 
-  useEffect(() => {
-    const run = async () => {
-      try {
-        setLoading(true);
-        const commentVm = await adapter.Comment.list(searchCriteria);
-        setComments(commentVm.comments);
-        setPage(commentVm.page);
-        setPageCount(commentVm.pageCount);
-      } catch (ex) {
-        displayError(ex, 'Getting data error');
-      }
-      setLoading(false);
-    };
+  const load = useCallback(
+    () => adapter.Comment.list({ issueId, page }),
+    [issueId, page]
+  );
 
-    run();
-  }, [searchCriteria]);
+  const { data, loading, reload } = useAsyncResource(
+    load,
+    EMPTY,
+    'Getting data error'
+  );
 
   const handlePaginationChange = (
-    event: React.ChangeEvent<unknown>,
-    page: number
+    _event: ChangeEvent<unknown>,
+    nextPage: number
   ) => {
-    setSearchCriteria({
-      ...searchCriteria,
-      Page: page
-    });
-  };
-
-  const handleCommentAdded = () => {
-    setSearchCriteria({
-      ...searchCriteria
-    });
-  };
-
-  const handleCommentStateChanged = () => {
-    setSearchCriteria({
-      ...searchCriteria
-    });
+    setPage(nextPage);
   };
 
   if (loading) return <LoadingPage />;
@@ -69,21 +44,19 @@ function IssueDetailsComments({ permissions }: Props) {
   return (
     <>
       <Box>
-        {canModifyPermission && (
-          <AddComment onCommentAdded={handleCommentAdded} />
-        )}
+        {capabilities.canModify && <AddComment onCommentAdded={reload} />}
 
-        {comments?.map((comment) => (
+        {data.items.map((comment) => (
           <Comment
             key={comment.id}
             comment={comment}
-            onCommentStateChanged={handleCommentStateChanged}
+            onCommentStateChanged={reload}
           />
         ))}
       </Box>
       <Pagination
-        pageCount={pageCount}
-        page={page}
+        pageCount={data.pageCount}
+        page={data.page}
         onChange={handlePaginationChange}
       />
     </>

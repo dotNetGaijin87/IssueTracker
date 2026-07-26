@@ -1,44 +1,46 @@
-import React, { useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Box, Grow, TextField } from '@mui/material';
 import AutorenewOutlinedIcon from '@mui/icons-material/AutorenewOutlined';
-import AddNewProject from './AddNewProject';
-import { ProjectProgress } from '@/models/project/projectProgress';
-import delayExec from '@/helpers/delayExec';
-import TooltipActionButton from '@/components/tooltipActionButton/TooltipActionButton';
+import type { ProjectListCriteria } from '@/adapters/adapter';
+import { useAuth } from '@/authentication/Auth';
 import Bar from '@/components/bar/Bar';
 import Field from '@/components/field/Field';
 import ProjectProgressSelect from '@/components/projectProgress/ProjectProgressSelect';
-import { useAuth } from '@/authentication/Auth';
-import { UserRole } from '@/models/user/userRole';
+import TooltipActionButton from '@/components/tooltipActionButton/TooltipActionButton';
+import delayExec from '@/helpers/delayExec';
+import { isPrivilegedRole } from '@/models/access';
+import type { ProjectProgress } from '@/models/project/projectProgress';
+import AddNewProject from './AddNewProject';
+
+const SEARCH_DEBOUNCE_MS = 1500;
 
 interface Props {
-  onSearch: (value: object) => void;
+  onSearch: (criteria: ProjectListCriteria) => void;
 }
 
 function ActionBar({ onSearch }: Props) {
   const { authUser } = useAuth();
-  const [initRender, setInitRender] = React.useState(true);
-  const [id, setId] = React.useState<string>('');
-  const [createdBy, setCreatedBy] = React.useState<string>('');
-  const [progress, setProgress] = React.useState<ProjectProgress | undefined>(
+  const [id, setId] = useState('');
+  const [createdBy, setCreatedBy] = useState('');
+  const [progress, setProgress] = useState<ProjectProgress | undefined>(
     undefined
   );
-  const [updateData, setUpdateData] = React.useState(false);
+  const [refreshToken, setRefreshToken] = useState(0);
+
+  const isInitialRender = useRef(true);
+  const onSearchRef = useRef(onSearch);
+  onSearchRef.current = onSearch;
 
   useEffect(() => {
-    if (initRender) {
-      setInitRender(false);
+    if (isInitialRender.current) {
+      isInitialRender.current = false;
       return;
     }
-    setUpdateData(false);
-    const search: any = {
-      progress: progress,
-      id: id,
-      createdBy: createdBy
-    };
-    return delayExec(() => onSearch({ ...search }), 1500);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [createdBy, id, updateData, progress]);
+
+    return delayExec(() => {
+      onSearchRef.current({ id, createdBy, progress });
+    }, SEARCH_DEBOUNCE_MS);
+  }, [id, createdBy, progress, refreshToken]);
 
   return (
     <Grow in={true}>
@@ -49,28 +51,27 @@ function ActionBar({ onSearch }: Props) {
               autoFocus
               size="small"
               value={id}
-              onChange={(e) => {
-                setId(e.target.value);
+              onChange={(event) => {
+                setId(event.target.value);
               }}
               label="Name"
             />
           </Field>
-
           <Field>
             <TextField
               size="small"
               value={createdBy}
-              onChange={(e) => {
-                setCreatedBy(e.target.value);
+              onChange={(event) => {
+                setCreatedBy(event.target.value);
               }}
               label="Created By"
             />
           </Field>
           <Field>
             <ProjectProgressSelect
-              withNotApplicable={true}
-              defaultValue={ProjectProgress.Unspecified}
+              includeAny
               label="Progress"
+              value={progress}
               onChange={setProgress}
             />
           </Field>
@@ -78,12 +79,13 @@ function ActionBar({ onSearch }: Props) {
 
         <Box display="flex" alignItems="center">
           <TooltipActionButton
-            title={'Refresh'}
+            title="Refresh"
             icon={<AutorenewOutlinedIcon />}
-            onClick={() => setUpdateData(true)}
+            onClick={() => {
+              setRefreshToken((token) => token + 1);
+            }}
           />
-          {(authUser?.role === UserRole.admin ||
-            authUser?.role === UserRole.manager) && <AddNewProject />}
+          {isPrivilegedRole(authUser?.role) && <AddNewProject />}
         </Box>
       </Box>
     </Grow>

@@ -1,25 +1,33 @@
+import { useEffect, useRef, useState } from 'react';
 import { Box, Grow, TextField } from '@mui/material';
-import React, { useEffect } from 'react';
-import Field from '@/components/field/Field';
+import type { UserListCriteria } from '@/adapters/adapter';
 import Bar from '@/components/bar/Bar';
+import Field from '@/components/field/Field';
 import delayExec from '@/helpers/delayExec';
 
+const SEARCH_DEBOUNCE_MS = 1500;
+
 interface Props {
-  onSearchClicked: (value: object) => void;
+  onSearch: (criteria: UserListCriteria) => void;
 }
 
-function ActionBar({ onSearchClicked }: Props) {
-  const [initRender, setInitRender] = React.useState(true);
-  const [id, setName] = React.useState<string>('');
-  const [email, setEmail] = React.useState<string>('');
+function ActionBar({ onSearch }: Props) {
+  const [id, setId] = useState('');
+  const [email, setEmail] = useState('');
+
+  const isInitialRender = useRef(true);
+  const onSearchRef = useRef(onSearch);
+  onSearchRef.current = onSearch;
 
   useEffect(() => {
-    if (initRender) {
-      setInitRender(false);
+    if (isInitialRender.current) {
+      isInitialRender.current = false;
       return;
     }
-    return delayExec(() => onSearchClicked({ id: id, email: email }), 1500);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+
+    return delayExec(() => {
+      onSearchRef.current({ id, email });
+    }, SEARCH_DEBOUNCE_MS);
   }, [id, email]);
 
   return (
@@ -30,8 +38,8 @@ function ActionBar({ onSearchClicked }: Props) {
             <TextField
               size="small"
               value={id}
-              onChange={(e) => {
-                setName(e.target.value);
+              onChange={(event) => {
+                setId(event.target.value);
               }}
               label="Name"
             />
@@ -40,8 +48,8 @@ function ActionBar({ onSearchClicked }: Props) {
             <TextField
               size="small"
               value={email}
-              onChange={(e) => {
-                setEmail(e.target.value);
+              onChange={(event) => {
+                setEmail(event.target.value);
               }}
               label="Email"
             />

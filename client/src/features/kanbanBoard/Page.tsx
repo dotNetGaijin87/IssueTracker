@@ -1,34 +1,32 @@
-import { useEffect, useState } from 'react';
+import { useCallback } from 'react';
 import { adapter } from '@/adapters/adapter';
 import { useAuth } from '@/authentication/Auth';
-import displayError from '@/helpers/errorHandling/displayError';
-import LoadingPage from '@/layout/common/LoadingPage';
 import Kanban from '@/components/kanban/Kanban';
-import { KanbanCard } from '@/models/kanbanCard/kanbanCard';
+import { useAsyncResource } from '@/helpers/useAsyncResource';
+import LoadingPage from '@/layout/common/LoadingPage';
+import type { KanbanCard } from '@/models/kanbanCard/kanbanCard';
 
-function KanbanBoard(): JSX.Element {
+const NO_CARDS: KanbanCard[] = [];
+
+function KanbanBoard() {
   const { authUser } = useAuth();
-  const [kanbanCards, setKanbanCards] = useState<KanbanCard[]>([]);
-  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    const run = async () => {
-      try {
-        setLoading(true);
-        const cards = await adapter.Issue.getIssueKanban();
-        setKanbanCards(cards);
-      } catch (ex) {
-        displayError(ex, 'Getting kanban data error');
-      }
-      setLoading(false);
-    };
+  const load = useCallback(
+    () => adapter.Issue.getKanban(),
+    // The board is scoped to the signed-in user server-side.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [authUser?.id]
+  );
 
-    run();
-  }, [authUser?.name]);
+  const { data: cards, loading } = useAsyncResource(
+    load,
+    NO_CARDS,
+    'Getting kanban data error'
+  );
 
   if (loading) return <LoadingPage />;
 
-  return <Kanban cards={kanbanCards} />;
+  return <Kanban cards={cards} />;
 }
 
 export default KanbanBoard;

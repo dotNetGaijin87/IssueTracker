@@ -8,16 +8,17 @@ import {
 } from '@mui/material';
 import TableContainer from '@/components/tableContainer/TableContainer';
 import { useAuth } from '@/authentication/Auth';
-import { User } from '@/models/user/user';
 import { UserRole } from '@/models/user/userRole';
+import type { User } from '@/models/user/user';
 import UserDataRow from './UserDataRow';
 
 interface Props {
-  users?: User[];
+  users: User[];
 }
 
 function UsersTable({ users }: Props) {
   const { authUser } = useAuth();
+  const isAdmin = authUser?.role === UserRole.admin;
 
   return (
     <TableContainer>
@@ -25,13 +26,11 @@ function UsersTable({ users }: Props) {
         <Table>
           <TableHead>
             <TableRow>
-              {authUser?.role === UserRole.admin && (
-                <TableCell align="center">Activation</TableCell>
-              )}
+              {isAdmin && <TableCell align="center">Activation</TableCell>}
               <TableCell align="center">Name</TableCell>
               <TableCell align="center">email</TableCell>
               <TableCell align="center">Role</TableCell>
-              {authUser?.role === UserRole.admin && (
+              {isAdmin && (
                 <>
                   <TableCell align="center">Registration Time</TableCell>
                   <TableCell align="center">Last Login Time</TableCell>
@@ -40,7 +39,7 @@ function UsersTable({ users }: Props) {
             </TableRow>
           </TableHead>
           <TableBody>
-            {users?.map((user: User) => (
+            {users.map((user) => (
               <UserDataRow key={user.id} user={user} />
             ))}
           </TableBody>

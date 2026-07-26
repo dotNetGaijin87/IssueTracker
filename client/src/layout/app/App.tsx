@@ -11,6 +11,7 @@ import UsersPage from '@/features/users/Page';
 import { AuthProvider } from '@/authentication/Auth';
 import SigningedOutPage from '@/features/login/SigningedOutPage';
 import GridCenterFlex from '@/layout/common/GridCenterFlex';
+import LoadingPage from '@/layout/common/LoadingPage';
 import MainContainer from '@/layout/common/MainContainer';
 import SigningInPage from '@/features/login/SigningPage';
 import SigningOutPage from '@/features/login/SigningOutPage';
@@ -100,7 +101,12 @@ function App() {
                       }
                     />
                     <Route path="signin" element={<SigningInPage />} />
-                    <Route path="/signin-callback" element={<KanbanBoard />} />
+                    {/*
+                      AuthProvider redirects to /kanban once it has exchanged the
+                      code, so this only shows briefly. Rendering the board here
+                      would fire an API call before a token exists.
+                    */}
+                    <Route path="/signin-callback" element={<LoadingPage />} />
                     <Route path="signout" element={<SigningOutPage />} />
                     <Route
                       path="/signout-callback"

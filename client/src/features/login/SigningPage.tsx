@@ -7,8 +7,7 @@ function SigningInPage() {
 
   useEffect(() => {
     signIn();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [signIn]);
 
   return <LoadingPage />;
 }

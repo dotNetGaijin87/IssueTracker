@@ -14,6 +14,7 @@ const drawerWidth = 50;
 
 function Header() {
   const { isAuthenticated, authUser, authInProgress } = useAuth();
+  const displayName = authUser?.name;
 
   return (
     <>
@@ -44,7 +45,7 @@ function Header() {
             flexDirection: 'row'
           }}
         >
-          {authUser?.name && (
+          {displayName !== undefined && (
             <Box
               sx={{
                 display: 'flex',
@@ -61,9 +62,13 @@ function Header() {
             >
               <AccountCircleIcon sx={{ color: 'primary.main', fontSize: 20 }} />
               <Typography
-                sx={{ color: 'text.primary', fontSize: '0.85rem', fontWeight: 500 }}
+                sx={{
+                  color: 'text.primary',
+                  fontSize: '0.85rem',
+                  fontWeight: 500
+                }}
               >
-                {authUser?.name}
+                {displayName}
               </Typography>
             </Box>
           )}

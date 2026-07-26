@@ -1,185 +1,165 @@
-import { useEffect, useState } from 'react';
-import {
-  Box,
-  Divider,
-  Grow,
-  TableBody,
-  TextField,
-  Typography
-} from '@mui/material';
-import { useParams } from 'react-router-dom';
+import { useCallback, useEffect, useState } from 'react';
+import { Box, Divider, Grow, TextField, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import LoadingPage from '@/layout/common/LoadingPage';
-import { adapter } from '@/adapters/adapter';
-import { Project, ProjectDefaultValue } from '@/models/project/project';
-import DeleteIcon from '@mui/icons-material/Delete';
-import SaveIcon from '@mui/icons-material/Save';
-import EditIcon from '@mui/icons-material/Edit';
-import CancelIcon from '@mui/icons-material/Cancel';
-import BugReportIcon from '@mui/icons-material/BugReport';
 import { toast } from 'react-toastify';
-import displayError from '@/helpers/errorHandling/displayError';
-import { UserRole } from '@/models/user/userRole';
 import { Controller, useForm } from 'react-hook-form';
+import BugReportIcon from '@mui/icons-material/BugReport';
+import CancelIcon from '@mui/icons-material/Cancel';
+import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
+import SaveIcon from '@mui/icons-material/Save';
+import { adapter, type UpdateProjectRequest } from '@/adapters/adapter';
 import { useAuth } from '@/authentication/Auth';
+import ButtonIconWithConfirmationDialog from '@/components/buttonIconWithConfirmationDialog/ButtonIconWithConfirmationDialog';
 import FormFieldWrapper from '@/components/formFieldWrapper/FormFieldWrapper';
-import safelyConvertDateTime from '@/helpers/time/safelyConvertDateTime';
 import MarkupEditor from '@/components/markupEditor/MarkupEditor';
 import Panel from '@/components/panel/Panel';
+import ProjectProgressBadge from '@/components/projectProgress/ProjectProgressBadge';
 import ProjectProgressSelect from '@/components/projectProgress/ProjectProgressSelect';
 import TooltipActionButton from '@/components/tooltipActionButton/TooltipActionButton';
-import ButtonIconWithConfirmationDialog from '@/components/buttonIconWithConfirmationDialog/ButtonIconWithConfirmationDialog';
-import { ProjectProgress } from '@/models/project/projectProgress';
-import ProjectProgressBadge from '@/components/projectProgress/ProjectProgressBadge';
 import VerticalDivider from '@/components/verticalDivider/VerticalDivider';
+import displayError from '@/helpers/errorHandling/displayError';
+import { SUMMARY_RULE } from '@/helpers/forms/validationRules';
+import { useProjectId } from '@/helpers/routing/useRouteId';
 import parseDateTimeToMessage from '@/helpers/time/parseDateTimeToMessage';
+import safelyConvertDateTime from '@/helpers/time/safelyConvertDateTime';
+import { useAsyncResource } from '@/helpers/useAsyncResource';
+import LoadingPage from '@/layout/common/LoadingPage';
+import NotFound from '@/layout/common/NotFound';
+import { projectCapabilities } from '@/models/access';
+import type { Project } from '@/models/project/project';
+import { ProjectProgress } from '@/models/project/projectProgress';
 
-function ProjectDetailsPage(): JSX.Element {
+type FormValues = Omit<UpdateProjectRequest, 'id'>;
+
+function ProjectDetailsPage() {
   const navigate = useNavigate();
   const { authUser } = useAuth();
-  const [loading, setLoading] = useState(false);
+  const projectId = useProjectId();
   const [editing, setEditing] = useState(false);
   const [updating, setUpdating] = useState(false);
-  const { projectId } = useParams<{ projectId: string }>();
-  const [project, setProject] = useState<Project>(ProjectDefaultValue);
 
-  const {
-    register,
-    formState: { errors },
-    handleSubmit,
-    control,
-    getValues,
-    reset
-  } = useForm<Project>({
-    defaultValues: project,
-    mode: 'all'
-  });
+  const load = useCallback(() => {
+    if (projectId === undefined) return Promise.resolve(undefined);
+    return adapter.Project.get(projectId);
+  }, [projectId]);
+
+  const { data: project, loading } = useAsyncResource<Project | undefined>(
+    load,
+    undefined,
+    'Loading project failed'
+  );
+
+  const [current, setCurrent] = useState<Project | undefined>(undefined);
+
+  const { register, formState, handleSubmit, control, reset } =
+    useForm<FormValues>({ mode: 'all' });
 
   useEffect(() => {
-    const run = async () => {
-      try {
-        setLoading(true);
-        if (projectId) {
-          const project = await adapter.Project.get(projectId);
-          setProject(project);
-          reset(project);
-        }
-      } catch (ex) {
-        displayError(ex, 'Updating data error');
-      }
-      setLoading(false);
-    };
+    if (project === undefined) return;
+    setCurrent(project);
+    reset({
+      summary: project.summary,
+      description: project.description,
+      progress: project.progress
+    });
+  }, [project, reset]);
 
-    run();
-  }, [projectId, reset]);
+  const capabilities = projectCapabilities({
+    role: authUser?.role,
+    isOwner: authUser?.id !== undefined && authUser.id === current?.createdBy
+  });
 
-  const handleProjectUpdate = async () => {
-    setUpdating(true);
-    await handleSubmit(async (data) => {
-      try {
-        const project = await adapter.Project.update({
-          id: data.id,
-          summary: data.summary,
-          progress: data.progress,
-          description: data.description
-        });
-        setProject(project);
-        toast.success('Data saved');
-      } catch (ex) {
-        displayError(ex, 'Saving data error');
-      }
-      setUpdating(false);
-      setEditing(false);
-    })();
-  };
+  const readOnly = !capabilities.canModify || !editing;
 
-  const hadleProjectRemoval = async (id: string) => {
+  const handleProjectUpdate = handleSubmit(async (values) => {
+    if (current === undefined) return;
+
     try {
-      await adapter.Project.delete(id);
+      setUpdating(true);
+      const updated = await adapter.Project.update({
+        id: current.id,
+        ...values
+      });
+      setCurrent(updated);
+      toast.success('Data saved');
+      setEditing(false);
+    } catch (error) {
+      displayError(error, 'Saving data error');
+    } finally {
+      setUpdating(false);
+    }
+  });
+
+  const handleProjectRemoval = async () => {
+    if (current === undefined) return;
+
+    try {
+      await adapter.Project.delete(current.id);
       navigate('/projects');
       toast.success('Project deleted');
-    } catch (ex: any) {
-      displayError(ex, 'Deleting project error');
+    } catch (error) {
+      displayError(error, 'Deleting project error');
     }
   };
 
-  const hadleShwoIssues = () => {
-    navigate(`/projects/${project.id}/issues`);
-  };
-
-  const canDelete = () =>
-    authUser?.role === UserRole.admin ||
-    authUser?.name === getValues('createdBy');
-
-  const canModify = () => canDelete();
-
-  const handleEditing = () => {
-    setEditing(true);
-  };
-
-  const handleCancelEditing = () => {
-    setEditing(false);
-  };
-
   if (loading) return <LoadingPage />;
+  if (current === undefined) return <NotFound />;
 
   return (
     <>
       <Box>
         <Box display="flex" justifyContent="space-between" alignItems="center">
           <Box display="flex" alignItems="center">
-            <Typography variant="h6">{getValues('id')}</Typography>
+            <Typography variant="h6">{current.id}</Typography>
             <VerticalDivider />
-            {!updating && (
-              <ProjectProgressBadge
-                value={getValues('progress') as ProjectProgress}
-              />
-            )}
+            {!updating && <ProjectProgressBadge value={current.progress} />}
           </Box>
           <Box display="flex">
-            {canDelete() && (
+            {capabilities.canDelete && (
               <ButtonIconWithConfirmationDialog
-                hoverOverTitle={'Delete Project'}
-                dialogText={'Delete Project?'}
+                hoverOverTitle="Delete Project"
+                dialogText="Delete Project?"
                 icon={<DeleteIcon />}
-                onConfirm={async () => {
-                  await hadleProjectRemoval(getValues('id'));
-                }}
+                onConfirm={handleProjectRemoval}
               />
             )}
 
-            {canModify() && (
-              <>
-                {editing ? (
-                  <Grow in={true}>
-                    <Box display="flex">
-                      <VerticalDivider />
-                      <TooltipActionButton
-                        title={'Save changes'}
-                        icon={<SaveIcon />}
-                        onClick={handleProjectUpdate}
-                      />
-                      <TooltipActionButton
-                        title={'Cancel changes'}
-                        icon={<CancelIcon />}
-                        onClick={handleCancelEditing}
-                      />
-                      <VerticalDivider />
-                    </Box>
-                  </Grow>
-                ) : (
-                  <TooltipActionButton
-                    title={'Edit Project'}
-                    icon={<EditIcon />}
-                    onClick={handleEditing}
-                  />
-                )}
-              </>
-            )}
+            {capabilities.canModify &&
+              (editing ? (
+                <Grow in={true}>
+                  <Box display="flex">
+                    <VerticalDivider />
+                    <TooltipActionButton
+                      title="Save changes"
+                      icon={<SaveIcon />}
+                      onClick={handleProjectUpdate}
+                    />
+                    <TooltipActionButton
+                      title="Cancel changes"
+                      icon={<CancelIcon />}
+                      onClick={() => {
+                        setEditing(false);
+                      }}
+                    />
+                    <VerticalDivider />
+                  </Box>
+                </Grow>
+              ) : (
+                <TooltipActionButton
+                  title="Edit Project"
+                  icon={<EditIcon />}
+                  onClick={() => {
+                    setEditing(true);
+                  }}
+                />
+              ))}
             <TooltipActionButton
-              title={'Show Issues'}
+              title="Show Issues"
               icon={<BugReportIcon />}
-              onClick={hadleShwoIssues}
+              onClick={() => {
+                navigate(`/projects/${current.id}/issues`);
+              }}
             />
           </Box>
         </Box>
@@ -191,88 +171,66 @@ function ProjectDetailsPage(): JSX.Element {
           sx={{ color: 'text.icon', m: 0.5 }}
         >
           <Typography variant="subtitle2">
-            {`Created ${parseDateTimeToMessage(
-              getValues('creationTime')
-            )} by ${getValues('createdBy')}`}
+            {`Created ${parseDateTimeToMessage(current.creationTime)} by ${current.createdBy}`}
           </Typography>
         </Box>
       </Box>
       <Panel>
-        <TableBody>
-          <FormFieldWrapper title="Summary">
+        <div style={{ width: '40%' }}>
+          <FormFieldWrapper title="Summary" highlighted={editing}>
             <TextField
               fullWidth
-              disabled={!canModify() || !editing}
+              disabled={readOnly}
               size="small"
-              error
-              helperText={
-                (errors.summary?.type === 'required' &&
-                  'Your input is required') ||
-                (errors.summary?.type === 'minLength' &&
-                  'Your input is below minimum of 10 characters') ||
-                (errors.summary?.type === 'maxLength' &&
-                  'Your input exceeds maximum of 100 characters')
-              }
-              {...register('summary', {
-                required: true,
-                minLength: 10,
-                maxLength: 100
-              })}
+              error={formState.errors.summary !== undefined}
+              helperText={formState.errors.summary?.message}
+              {...register('summary', SUMMARY_RULE)}
             />
           </FormFieldWrapper>
-          <FormFieldWrapper title="Progress">
+          <FormFieldWrapper title="Progress" highlighted={editing}>
             <Controller
               control={control}
               name="progress"
               render={({ field }) => (
                 <ProjectProgressSelect
-                  args={field}
                   fullWidth
-                  defaultValue={ProjectProgress.Open}
-                  disabled={!canModify() || !editing}
+                  disabled={readOnly}
+                  value={field.value}
+                  onBlur={field.onBlur}
+                  onChange={(value) => {
+                    field.onChange(value ?? ProjectProgress.Open);
+                  }}
                 />
               )}
             />
           </FormFieldWrapper>
           <FormFieldWrapper title="Creation Time">
-            <Controller
-              control={control}
-              name="creationTime"
-              render={({ field: { value } }) => (
-                <TextField
-                  fullWidth
-                  disabled
-                  size="small"
-                  value={safelyConvertDateTime(value)}
-                />
-              )}
+            <TextField
+              fullWidth
+              disabled
+              size="small"
+              value={safelyConvertDateTime(current.creationTime)}
             />
           </FormFieldWrapper>
           <FormFieldWrapper title="Completion Time">
-            <Controller
-              control={control}
-              name="completionTime"
-              render={({ field: { value } }) => (
-                <TextField
-                  fullWidth
-                  disabled
-                  size="small"
-                  value={safelyConvertDateTime(value)}
-                />
-              )}
+            <TextField
+              fullWidth
+              disabled
+              size="small"
+              value={safelyConvertDateTime(current.completionTime)}
             />
           </FormFieldWrapper>
-        </TableBody>
+        </div>
         <Controller
           control={control}
           name="description"
-          render={({ field: { onChange, onBlur, value } }) => (
+          render={({ field }) => (
             <MarkupEditor
               title="Description"
-              value={value}
-              disabled={!canModify() || !editing}
-              onBlur={onBlur}
-              onChange={onChange}
+              value={field.value}
+              disabled={readOnly}
+              onBlur={field.onBlur}
+              onChange={field.onChange}
             />
           )}
         />

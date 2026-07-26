@@ -1,62 +1,51 @@
-import React, { useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Box, Grow, TextField } from '@mui/material';
 import AutorenewOutlinedIcon from '@mui/icons-material/AutorenewOutlined';
-import AddNewIssue from './AddNewIssue';
-import IssueProgressSelect from '@/components/issueProgress/IssueProgressSelect';
-import IssuePrioritySelect from '@/components/issuePriority/IssuePrioritySelect';
-import Field from '@/components/field/Field';
+import type { IssueListCriteria } from '@/adapters/adapter';
 import Bar from '@/components/bar/Bar';
-import delayExec from '@/helpers/delayExec';
-import TooltipActionButton from '@/components/tooltipActionButton/TooltipActionButton';
-import { IssueType } from '@/models/issue/issueType';
+import Field from '@/components/field/Field';
+import IssuePrioritySelect from '@/components/issuePriority/IssuePrioritySelect';
+import IssueProgressSelect from '@/components/issueProgress/IssueProgressSelect';
 import IssueTypeSelect from '@/components/issueType/IssueTypeSelect';
-import { IssueProgress } from '@/models/issue/issueProgress';
-import { IssuePriority } from '@/models/issue/issuePriority';
+import TooltipActionButton from '@/components/tooltipActionButton/TooltipActionButton';
+import delayExec from '@/helpers/delayExec';
+import type { IssuePriority } from '@/models/issue/issuePriority';
+import type { IssueProgress } from '@/models/issue/issueProgress';
+import type { IssueType } from '@/models/issue/issueType';
+import AddNewIssue from './AddNewIssue';
+
+const SEARCH_DEBOUNCE_MS = 1500;
 
 interface Props {
-  onSearch: (value: IssueListSearchCriteria) => void;
-}
-
-interface IssueListSearchCriteria {
-  name: '';
-  createdBy: '';
-  Type: IssueType;
-  Progress: IssueProgress;
-  Priority: IssuePriority;
+  onSearch: (criteria: IssueListCriteria) => void;
 }
 
 function ActionBar({ onSearch }: Props) {
-  const [initRender, setInitRender] = React.useState(true);
-  const [name, setName] = React.useState('');
-  const [createdBy, setCreatedBy] = React.useState('');
-  const [issueType, setIssueType] = React.useState(IssueType.Unspecified);
-  const [issueProgress, setIssueProgress] = React.useState(
-    IssueProgress.Unspecified
+  const [id, setId] = useState('');
+  const [createdBy, setCreatedBy] = useState('');
+  const [type, setType] = useState<IssueType | undefined>(undefined);
+  const [progress, setProgress] = useState<IssueProgress | undefined>(
+    undefined
   );
-  const [issuePriority, setIssuePriority] = React.useState(
-    IssuePriority.Unspecified
+  const [priority, setPriority] = useState<IssuePriority | undefined>(
+    undefined
   );
+  const [refreshToken, setRefreshToken] = useState(0);
 
-  const [updateData, setUpdateData] = React.useState(false);
+  const isInitialRender = useRef(true);
+  const onSearchRef = useRef(onSearch);
+  onSearchRef.current = onSearch;
 
   useEffect(() => {
-    if (initRender) {
-      setInitRender(false);
+    if (isInitialRender.current) {
+      isInitialRender.current = false;
       return;
     }
-    setUpdateData(false);
-    const search: any = {
-      name: name,
-      createdBy: createdBy,
-      Type: issueType === IssueType.Unspecified ? undefined : issueType,
-      Progress:
-        issueProgress === IssueProgress.Unspecified ? undefined : issueProgress,
-      Priority:
-        issuePriority === IssuePriority.Unspecified ? undefined : issuePriority
-    };
-    return delayExec(() => onSearch({ ...search }), 1500);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [name, createdBy, issuePriority, issueProgress, issueType, updateData]);
+
+    return delayExec(() => {
+      onSearchRef.current({ id, createdBy, type, progress, priority });
+    }, SEARCH_DEBOUNCE_MS);
+  }, [id, createdBy, type, progress, priority, refreshToken]);
 
   return (
     <Grow in={true}>
@@ -65,9 +54,9 @@ function ActionBar({ onSearch }: Props) {
           <Field>
             <TextField
               size="small"
-              value={name}
-              onChange={(e) => {
-                setName(e.target.value);
+              value={id}
+              onChange={(event) => {
+                setId(event.target.value);
               }}
               label="Name"
             />
@@ -76,42 +65,44 @@ function ActionBar({ onSearch }: Props) {
             <TextField
               size="small"
               value={createdBy}
-              onChange={(e) => {
-                setCreatedBy(e.target.value);
+              onChange={(event) => {
+                setCreatedBy(event.target.value);
               }}
               label="Created By"
             />
           </Field>
           <Field>
             <IssueTypeSelect
-              withNotApplicable={true}
-              defaultValue={IssueType.Unspecified}
+              includeAny
               label="Type"
-              onChange={setIssueType}
+              value={type}
+              onChange={setType}
             />
           </Field>
           <Field>
             <IssueProgressSelect
-              withNotApplicable={true}
-              defaultValue={IssueProgress.Unspecified}
+              includeAny
               label="Progress"
-              onChange={setIssueProgress}
+              value={progress}
+              onChange={setProgress}
             />
           </Field>
           <Field>
             <IssuePrioritySelect
-              withNotApplicable={true}
-              defaultValue={IssuePriority.Unspecified}
+              includeAny
               label="Priority"
-              onChange={setIssuePriority}
+              value={priority}
+              onChange={setPriority}
             />
           </Field>
         </Bar>
         <Box display="flex" alignItems="center">
           <TooltipActionButton
-            title={'Refresh'}
+            title="Refresh"
             icon={<AutorenewOutlinedIcon />}
-            onClick={() => setUpdateData(true)}
+            onClick={() => {
+              setRefreshToken((token) => token + 1);
+            }}
           />
           <AddNewIssue />
         </Box>
@@ -121,4 +112,3 @@ function ActionBar({ onSearch }: Props) {
 }
 
 export default ActionBar;
-export type { IssueListSearchCriteria };
