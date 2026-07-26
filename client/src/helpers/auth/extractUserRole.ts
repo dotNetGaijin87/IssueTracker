@@ -1,19 +1,14 @@
-import { User } from '@auth0/auth0-spa-js';
-import { UserRole } from '@/models/user/userRole';
+import type { User as Auth0User } from '@auth0/auth0-spa-js';
+import { z } from 'zod';
+import { UserRoleSchema, type UserRole } from '@/models/user/userRole';
 
-function extractUserRole(user: User | undefined): UserRole {
-  if (user === undefined) {
-    new Error('No user role');
-  }
-  const roleStr: string[] = user!['http://namespace//roles'];
+const ROLES_CLAIM = 'http://namespace//roles';
 
-  if (roleStr === undefined) {
-    new Error('No user role');
-  }
+const RolesClaimSchema = z.array(UserRoleSchema).nonempty();
 
-  const role: UserRole = <UserRole>roleStr[0];
-
-  return role;
+function extractUserRole(user: Auth0User | undefined): UserRole | undefined {
+  const result = RolesClaimSchema.safeParse(user?.[ROLES_CLAIM]);
+  return result.success ? result.data[0] : undefined;
 }
 
 export default extractUserRole;

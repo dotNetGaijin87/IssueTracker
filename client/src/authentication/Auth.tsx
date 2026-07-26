@@ -1,30 +1,37 @@
 /* eslint-disable react-refresh/only-export-components */
 import React from 'react';
-import createAuth0Client, { Auth0Client } from '@auth0/auth0-spa-js';
-import { authSettings } from '@/AppSettings';
 import { adapter } from '@/adapters/adapter';
-import { UserRole } from '@/models/user/userRole';
+import { authSettings } from '@/AppSettings';
 import extractUserRole from '@/helpers/auth/extractUserRole';
-import extractUserId from '@/helpers/auth/extractUserId';
+import { UserIdSchema, type UserId } from '@/models/ids';
+import type { UserRole } from '@/models/user/userRole';
+import { getAuth0Client } from './authClient';
 
-interface Auth0User {
-  name?: string;
-  email?: string;
-  sub?: string;
-  role?: UserRole;
-}
-interface IAuth0Context {
-  authUser?: Auth0User;
+export type AuthUser = {
+  /** The API's user id: Auth0's `name` claim is what the backend persists. */
+  id: UserId | undefined;
+  name: string | undefined;
+  email: string | undefined;
+  role: UserRole | undefined;
+};
+
+type Auth0ContextValue = {
+  authUser: AuthUser | undefined;
   isAuthenticated: boolean;
   authInProgress: boolean;
   signIn: () => void;
   signOut: () => void;
-}
-export const Auth0Context = React.createContext<IAuth0Context>({
+};
+
+/** Placeholder for consumers rendered outside an `AuthProvider`. */
+const notReady = () => undefined;
+
+export const Auth0Context = React.createContext<Auth0ContextValue>({
+  authUser: undefined,
   authInProgress: true,
   isAuthenticated: false,
-  signIn: () => {},
-  signOut: () => {}
+  signIn: notReady,
+  signOut: notReady
 });
 
 export const useAuth = () => React.useContext(Auth0Context);
@@ -32,72 +39,73 @@ export const useAuth = () => React.useContext(Auth0Context);
 export const AuthProvider: React.FC<React.PropsWithChildren> = ({
   children
 }) => {
-  const [isAuthenticated, setIsAuthenticated] = React.useState<boolean>(false);
-  const [authUser, setAuthUser] = React.useState<Auth0User | undefined>(
+  const [isAuthenticated, setIsAuthenticated] = React.useState(false);
+  const [authUser, setAuthUser] = React.useState<AuthUser | undefined>(
     undefined
   );
-  const [auth0Client, setAuth0Client] = React.useState<Auth0Client>();
-  const [authInProgress, setLoading] = React.useState<boolean>(true);
+  const [authInProgress, setAuthInProgress] = React.useState(true);
 
   React.useEffect(() => {
-    const initAuth0 = async () => {
-      setLoading(true);
-      const auth0FromHook = await createAuth0Client(authSettings);
-      setAuth0Client(auth0FromHook);
+    let cancelled = false;
+
+    const initialise = async () => {
+      const client = await getAuth0Client();
 
       if (
         window.location.pathname === '/signin-callback' &&
-        window.location.search.indexOf('code=') > -1
+        window.location.search.includes('code=')
       ) {
-        await auth0FromHook.handleRedirectCallback();
-        window.location.replace(window.location.origin + '/kanban');
+        await client.handleRedirectCallback();
+        window.location.replace(`${window.location.origin}/kanban`);
+        return;
       }
 
-      const isAuthenticatedFromHook = await auth0FromHook.isAuthenticated();
-      if (isAuthenticatedFromHook) {
-        const user = await auth0FromHook.getUser();
-        if (user?.sub !== undefined) {
-          await adapter.User.createSafely(extractUserId(user?.sub));
-          setAuthUser({ ...user, role: extractUserRole(user) });
-          setIsAuthenticated(isAuthenticatedFromHook);
-        }
-      }
+      if (!(await client.isAuthenticated())) return;
 
-      setLoading(false);
+      const user = await client.getUser();
+      const id = UserIdSchema.safeParse(user?.name);
+      if (!id.success) return;
+
+      await adapter.User.createSafely();
+      if (cancelled) return;
+
+      setAuthUser({
+        id: id.data,
+        name: user?.name,
+        email: user?.email,
+        role: extractUserRole(user)
+      });
+      setIsAuthenticated(true);
     };
-    initAuth0();
+
+    void initialise().finally(() => {
+      if (!cancelled) setAuthInProgress(false);
+    });
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
-  const getAuth0ClientFromState = () => {
-    if (auth0Client === undefined) {
-      throw new Error('Auth0 client is undefined');
-    }
-    return auth0Client;
-  };
+  const signIn = React.useCallback(() => {
+    void getAuth0Client().then((client) => client.loginWithRedirect());
+  }, []);
+
+  const signOut = React.useCallback(() => {
+    void getAuth0Client().then((client) =>
+      client.logout({
+        client_id: authSettings.client_id,
+        returnTo: `${window.location.origin}/signout-callback`
+      })
+    );
+  }, []);
+
+  const value = React.useMemo<Auth0ContextValue>(
+    () => ({ isAuthenticated, authUser, authInProgress, signIn, signOut }),
+    [isAuthenticated, authUser, authInProgress, signIn, signOut]
+  );
 
   return (
-    <Auth0Context.Provider
-      value={{
-        isAuthenticated,
-        authUser,
-        signIn: () => {
-          getAuth0ClientFromState()?.loginWithRedirect();
-        },
-        signOut: () =>
-          getAuth0ClientFromState()?.logout({
-            client_id: authSettings.client_id,
-            returnTo: window.location.origin + '/signout-callback'
-          }),
-        authInProgress
-      }}
-    >
-      {children}
-    </Auth0Context.Provider>
+    <Auth0Context.Provider value={value}>{children}</Auth0Context.Provider>
   );
-};
-
-export const getAccessToken = async () => {
-  const auth0FromHook = await createAuth0Client(authSettings);
-  const accessToken = await auth0FromHook.getTokenSilently();
-  return accessToken;
 };
