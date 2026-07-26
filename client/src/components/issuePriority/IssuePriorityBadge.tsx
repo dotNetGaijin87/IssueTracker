@@ -1,21 +1,11 @@
-import { IssuePriority } from '@/models/issue/issuePriority';
-import issuePriorityList from './issuePriority/issuePriorityList';
+import StatusBadge, {
+  type BoundStatusBadgeProps
+} from '@/components/status/StatusBadge';
+import type { IssuePriority } from '@/models/issue/issuePriority';
+import { issuePriorityBadges } from './issuePriorityBadges';
 
-interface Props {
-  value?: IssuePriority;
-  unstyled?: boolean;
-  borderless?: boolean;
-}
-function IssuePriorityBadge({
-  value,
-  unstyled,
-  borderless
-}: Props): JSX.Element {
-  return (
-    issuePriorityList(unstyled, borderless).find(
-      (item: any) => item.value === value
-    )?.element ?? <div></div>
-  );
+function IssuePriorityBadge(props: BoundStatusBadgeProps<IssuePriority>) {
+  return <StatusBadge {...props} registry={issuePriorityBadges} />;
 }
 
 export default IssuePriorityBadge;

@@ -6,13 +6,15 @@ import {
   TextareaAutosize,
   Typography
 } from '@mui/material';
-import { IssueComment } from '@/models/comment/issueComment';
-import parseDateTimeToMessage from '@/helpers/time/parseDateTimeToMessage';
 import { adapter } from '@/adapters/adapter';
-import displayError from '@/helpers/errorHandling/displayError';
 import { useAuth } from '@/authentication/Auth';
 import CommentButton from '@/components/commentButton/CommentButton';
+import displayError from '@/helpers/errorHandling/displayError';
+import parseDateTimeToMessage from '@/helpers/time/parseDateTimeToMessage';
+import type { IssueComment } from '@/models/comment/issueComment';
 import { UserRole } from '@/models/user/userRole';
+
+const AVATAR_INITIALS = 2;
 
 interface Props {
   comment: IssueComment;
@@ -21,44 +23,37 @@ interface Props {
 
 function Comment({ comment, onCommentStateChanged }: Props) {
   const { authUser } = useAuth();
-  const [content, setContent] = useState(comment?.content);
+  const [content, setContent] = useState(comment.content);
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
+
   const canModify =
-    authUser?.name === comment.userId || authUser?.role === UserRole.admin;
+    authUser?.id === comment.userId || authUser?.role === UserRole.admin;
 
   const handleSaveComment = async () => {
     try {
       setSaving(true);
-      await adapter.Comment.update({
-        id: comment.id,
-        content: content
-      });
-      if (onCommentStateChanged) onCommentStateChanged();
-    } catch (ex) {
-      displayError(ex, 'Updating comment failed');
+      await adapter.Comment.update({ id: comment.id, content });
+      setEditing(false);
+      onCommentStateChanged?.();
+    } catch (error) {
+      displayError(error, 'Updating comment failed');
+    } finally {
+      setSaving(false);
     }
-    setSaving(false);
   };
 
   const handleDeleteComment = async () => {
     try {
       setDeleting(true);
       await adapter.Comment.delete(comment.id);
-      if (onCommentStateChanged) onCommentStateChanged();
-    } catch (ex) {
-      displayError(ex, 'Deleting comment failed');
+      onCommentStateChanged?.();
+    } catch (error) {
+      displayError(error, 'Deleting comment failed');
+    } finally {
+      setDeleting(false);
     }
-    setDeleting(false);
-  };
-
-  const handleEditComment = () => {
-    setEditing(true);
-  };
-
-  const handleCancelEditingComment = () => {
-    setEditing(false);
   };
 
   return (
@@ -72,7 +67,7 @@ function Comment({ comment, onCommentStateChanged }: Props) {
       <Box display="flex">
         <Stack>
           <Avatar alt="User">
-            {comment?.userId.substring(0, 2).toUpperCase()}
+            {comment.userId.substring(0, AVATAR_INITIALS).toUpperCase()}
           </Avatar>
         </Stack>
         <Box
@@ -87,7 +82,9 @@ function Comment({ comment, onCommentStateChanged }: Props) {
             disabled={!canModify || !editing}
             minRows={4}
             value={content}
-            onChange={(e) => setContent(e.target.value)}
+            onChange={(event) => {
+              setContent(event.target.value);
+            }}
             style={{
               backgroundColor: 'inherit',
               color: 'inherit',
@@ -107,13 +104,18 @@ function Comment({ comment, onCommentStateChanged }: Props) {
                 label="Save"
                 color="secondary"
                 loading={saving}
-                onClick={handleSaveComment}
+                onClick={() => {
+                  void handleSaveComment();
+                }}
               />
               <CommentButton
                 label="Cancel"
                 color="secondary"
                 loading={false}
-                onClick={handleCancelEditingComment}
+                onClick={() => {
+                  setContent(comment.content);
+                  setEditing(false);
+                }}
               />
             </>
           ) : (
@@ -121,12 +123,16 @@ function Comment({ comment, onCommentStateChanged }: Props) {
               <CommentButton
                 label="Edit"
                 loading={false}
-                onClick={handleEditComment}
+                onClick={() => {
+                  setEditing(true);
+                }}
               />
               <CommentButton
                 label="Delete"
                 loading={deleting}
-                onClick={handleDeleteComment}
+                onClick={() => {
+                  void handleDeleteComment();
+                }}
               />
             </>
           )}

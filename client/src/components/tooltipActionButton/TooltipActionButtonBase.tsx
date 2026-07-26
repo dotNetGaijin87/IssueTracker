@@ -1,14 +1,19 @@
-import * as React from 'react';
-import { Box, IconButton, Tooltip } from '@mui/material';
+import type { ReactNode } from 'react';
+import { Box, IconButton, Tooltip, type TooltipProps } from '@mui/material';
 
 interface Props {
   title: string;
-  icon: React.ReactNode;
-  tooltipArgs?: any;
-  action?: () => Promise<void>;
+  icon: ReactNode;
+  tooltipProps?: Partial<Omit<TooltipProps, 'title' | 'children'>>;
+  onClick?: () => void;
 }
 
-function TooltipActionButtonBase({ title, icon, tooltipArgs, action }: Props) {
+function TooltipActionButtonBase({
+  title,
+  icon,
+  tooltipProps,
+  onClick
+}: Props) {
   return (
     <Box
       sx={{
@@ -20,8 +25,8 @@ function TooltipActionButtonBase({ title, icon, tooltipArgs, action }: Props) {
         borderStyle: 'solid'
       }}
     >
-      <Tooltip title={title} {...tooltipArgs}>
-        <IconButton onClick={action}>{icon}</IconButton>
+      <Tooltip title={title} {...tooltipProps}>
+        <IconButton onClick={onClick}>{icon}</IconButton>
       </Tooltip>
     </Box>
   );

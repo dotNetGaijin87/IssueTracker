@@ -1,20 +1,27 @@
+import { useState, type ReactNode } from 'react';
 import { CircularProgress } from '@mui/material';
-import React from 'react';
 import TooltipActionButtonBase from './TooltipActionButtonBase';
 
 interface Props {
   title: string;
   color?: string;
-  icon: JSX.Element;
-  args?: any;
-  onClick: () => void;
+  icon: ReactNode;
+  onClick: () => void | Promise<void>;
 }
 
-function TooltipActionButton({ title, color, icon, args, onClick }: Props) {
-  const [processing, setProcessing] = React.useState(false);
+function TooltipActionButton({ title, color, icon, onClick }: Props) {
+  const [processing, setProcessing] = useState(false);
+
+  const handleClick = () => {
+    setProcessing(true);
+    void Promise.resolve(onClick()).finally(() => {
+      setProcessing(false);
+    });
+  };
 
   return (
     <TooltipActionButtonBase
+      title={title}
       icon={
         processing ? (
           <CircularProgress size={24} color="primary" disableShrink />
@@ -22,17 +29,11 @@ function TooltipActionButton({ title, color, icon, args, onClick }: Props) {
           icon
         )
       }
-      title={title}
-      {...args}
-      action={async () => {
-        setProcessing(true);
-        await onClick();
-        setProcessing(false);
-      }}
-      tooltipArgs={{
+      onClick={handleClick}
+      tooltipProps={{
         placement: 'top',
         sx: {
-          color: color ? color : 'text.icon',
+          color: color ?? 'text.icon',
           '&:hover': { bgcolor: 'transparent' }
         }
       }}

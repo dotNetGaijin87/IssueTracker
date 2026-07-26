@@ -6,11 +6,13 @@ import {
   TextareaAutosize,
   Typography
 } from '@mui/material';
-import { useAuth } from '@/authentication/Auth';
 import { adapter } from '@/adapters/adapter';
-import displayError from '@/helpers/errorHandling/displayError';
-import { useParams } from 'react-router-dom';
+import { useAuth } from '@/authentication/Auth';
 import CommentButton from '@/components/commentButton/CommentButton';
+import displayError from '@/helpers/errorHandling/displayError';
+import { useIssueId } from '@/helpers/routing/useRouteId';
+
+const AVATAR_INITIALS = 2;
 
 interface Props {
   onCommentAdded?: () => void;
@@ -18,27 +20,23 @@ interface Props {
 
 function AddComment({ onCommentAdded }: Props) {
   const { authUser } = useAuth();
-  const { issueId } = useParams<{ issueId: string }>();
+  const issueId = useIssueId();
   const [content, setContent] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
 
   const handleAddComment = async () => {
-    try {
-      setLoading(true);
-      await adapter.Comment.create({
-        userId: authUser?.name,
-        issueId: issueId,
-        content: content
-      });
-      if (onCommentAdded) onCommentAdded();
-    } catch (ex) {
-      displayError(ex, 'Adding comment failed');
-    }
-    setLoading(false);
-  };
+    if (issueId === undefined || authUser?.id === undefined) return;
 
-  const handleClearComment = async () => {
-    setContent('');
+    try {
+      setSaving(true);
+      await adapter.Comment.create({ userId: authUser.id, issueId, content });
+      setContent('');
+      onCommentAdded?.();
+    } catch (error) {
+      displayError(error, 'Adding comment failed');
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -49,7 +47,7 @@ function AddComment({ onCommentAdded }: Props) {
       <Box display="flex">
         <Stack>
           <Avatar alt="User">
-            {authUser?.name?.substring(0, 2).toUpperCase()}
+            {authUser?.name?.substring(0, AVATAR_INITIALS).toUpperCase()}
           </Avatar>
         </Stack>
         <Box
@@ -63,7 +61,9 @@ function AddComment({ onCommentAdded }: Props) {
           <TextareaAutosize
             minRows={4}
             value={content}
-            onChange={(e) => setContent(e.target.value)}
+            onChange={(event) => {
+              setContent(event.target.value);
+            }}
             style={{
               backgroundColor: 'inherit',
               minWidth: 500,
@@ -76,13 +76,17 @@ function AddComment({ onCommentAdded }: Props) {
       <Box display="flex" justifyContent="end">
         <CommentButton
           label="Add"
-          loading={loading}
-          onClick={handleAddComment}
+          loading={saving}
+          onClick={() => {
+            void handleAddComment();
+          }}
         />
         <CommentButton
           label="Clear"
           loading={false}
-          onClick={handleClearComment}
+          onClick={() => {
+            setContent('');
+          }}
         />
       </Box>
     </Box>
